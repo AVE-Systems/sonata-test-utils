@@ -12,3 +12,11 @@
     - SonataAdminListBatchActionsTraitTest для тестирования общих действий на
     странице списка сущностей.
     - SonataAdminTabTraitTest для тестирования вкладок.
+
+Для запуска тестов сначала необходимо установить зависимости через composer
+
+`composer install`
+
+После запустить тесты
+
+`vendor/bin/phpunit tests/`

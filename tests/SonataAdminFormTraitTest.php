@@ -1,0 +1,664 @@
+<?php
+
+namespace Tests;
+
+use PHPUnit\Framework\ExpectationFailedException;
+use PHPUnit\Framework\TestCase;
+use Symfony\Component\DomCrawler\Crawler;
+use AveSystems\SonataTestUtils\SonataAdminFormTrait;
+
+class SonataAdminFormTraitTest extends TestCase
+{
+    use SonataAdminFormTrait;
+
+    public function dataProvider_TestAssertFormFieldValueEquals()
+    {
+        $html = <<<'HTML'
+          <form>
+                <div class="row">
+                  <div class="col-md-12">
+                    <div class="row">
+                      <div class="col-md-12">
+                        <div class="box box-primary">
+                          <div class="box-body">
+                            <div class="sonata-ba-collapsed-fields">
+                              <div class="form-group">
+                                <label class="control-label required">
+                                  Время проведения
+                                </label>
+                                <div class="sonata-ba-field sonata-ba-field-standard-natural">
+                                  <div class="input-group">
+                                    <div class="input-group date">
+                                      <input type="text" 
+                                        class="sonata-medium-date form-control" 
+                                        name="sbb9cecc71b[timeOfAppointment]"
+                                        value="27.08.2019 09:24"
+                                      >
+                                    </div>
+                                  </div>
+                                </div>
+                              </div>
+                              <div class="form-group">
+                                <label class="control-label required">
+                                  Продолжительность
+                                </label>
+                                <div class="sonata-ba-field sonata-ba-field-standard-natural">
+                                  <div class="input-group">
+                                    <div class="input-group date">
+                                      <input type="number" 
+                                        class="form-control" 
+                                        name="sbb9cecc71b[duration]"
+                                        value="22"
+                                      >
+                                    </div>
+                                  </div>
+                                </div>
+                              </div>
+                              <div class="form-group">
+                                <label class="control-label required">
+                                  Повестка
+                                </label>
+                                <div class="sonata-ba-field sonata-ba-field-standard-natural">
+                                  <textarea 
+                                    class="form-control" 
+                                    name="sbb9cecc71b[description]"
+                                  >
+                                  Lorem Ipsum - это текст-"рыба",
+                                  часто используемый в печати.
+                                  </textarea>
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </form>
+HTML;
+
+        return [[$html]];
+    }
+
+    /**
+     * @dataProvider dataProvider_TestAssertFormFieldValueEquals
+     *
+     * @param string $html
+     */
+    public function testAssertFormTextFieldValueEquals_ShouldThrowException(
+        string $html
+    ) {
+        $this->expectException(ExpectationFailedException::class);
+        $this->expectExceptionMessageMatches(
+            '.Значение в поле ввода "Время проведения" не соответствует ожидаемому.'
+        );
+
+        $crawler = new Crawler();
+        $crawler->addHtmlContent($html);
+
+        $this->assertFormTextFieldValueEquals(
+            'Lorem Ipsum - это текст-"рыба", часто используемый в печати.',
+            'Время проведения',
+            $crawler
+        );
+    }
+
+    /**
+     * @dataProvider dataProvider_TestAssertFormFieldValueEquals
+     *
+     * @param string $html
+     */
+    public function testAssertFormTextFieldValueEquals_ShouldNotThrowException(
+        string $html
+    ) {
+        $crawler = new Crawler();
+        $crawler->addHtmlContent($html);
+
+        $this->assertFormTextFieldValueEquals(
+            '27.08.2019 09:24',
+            'Время проведения',
+            $crawler
+        );
+    }
+
+    /**
+     * @dataProvider dataProvider_TestAssertFormFieldValueEquals
+     *
+     * @param string $html
+     */
+    public function testAssertFormNumberFieldValueEquals_ShouldThrowException(
+        string $html
+    ) {
+        $this->expectException(ExpectationFailedException::class);
+        $this->expectExceptionMessageMatches(
+            '.Значение в поле ввода "Продолжительность" не соответствует ожидаемому.'
+        );
+
+        $crawler = new Crawler();
+        $crawler->addHtmlContent($html);
+
+        $this->assertFormNumberFieldValueEquals(
+            '22000',
+            'Продолжительность',
+            $crawler
+        );
+    }
+
+    /**
+     * @dataProvider dataProvider_TestAssertFormFieldValueEquals
+     *
+     * @param string $html
+     */
+    public function testAssertFormNumberFieldValueEquals_ShouldNotThrowException(
+        string $html
+    ) {
+        $crawler = new Crawler();
+        $crawler->addHtmlContent($html);
+
+        $this->assertFormNumberFieldValueEquals(
+            '22',
+            'Продолжительность',
+            $crawler
+        );
+    }
+
+    /**
+     * @dataProvider dataProvider_TestAssertFormFieldValueEquals
+     *
+     * @param string $html
+     */
+    public function testAssertFormTextareaFieldValueEquals_ShouldThrowException(
+        string $html
+    ) {
+        $this->expectException(ExpectationFailedException::class);
+        $this->expectExceptionMessageMatches(
+            '.Значение в поле ввода "Повестка" не соответствует ожидаемому.'
+        );
+
+        $crawler = new Crawler();
+        $crawler->addHtmlContent($html);
+
+        $this->assertFormTextareaFieldValueEquals(
+            '27.08.2019 09:24',
+            'Повестка',
+            $crawler
+        );
+    }
+
+    /**
+     * @dataProvider dataProvider_TestAssertFormFieldValueEquals
+     *
+     * @param string $html
+     */
+    public function testAssertFormTextareaFieldValueEquals_ShouldNotThrowException(
+        string $html
+    ) {
+        $crawler = new Crawler();
+        $crawler->addHtmlContent($html);
+
+        $this->assertFormTextareaFieldValueEquals(
+            'Lorem Ipsum - это текст-"рыба", часто используемый в печати.',
+            'Повестка',
+            $crawler
+        );
+    }
+
+    public function dataProvider_TestAssertFormActionButtonExistsAndNotExists()
+    {
+        $html = <<<'HTML'
+          <form>
+            <div class="sonata-ba-form-actions well well-small form-actions">
+                <button type="submit" class="btn btn-success" name="btn_update_and_edit">
+                    <i class="fa fa-save" aria-hidden="true"></i> Сохранить
+                </button>
+                <a class="btn btn-danger" href="/link/delete">
+                <i class="fa fa-minus-circle" aria-hidden="true"></i>Удалить</a>
+            </div>
+          </form>
+HTML;
+
+        return [[$html]];
+    }
+
+    /**
+     * @dataProvider dataProvider_TestAssertFormActionButtonExistsAndNotExists
+     *
+     * @param string $html
+     */
+    public function testsAssertFormActionButtonExists_Successful(
+        string $html
+    ) {
+        $crawler = new Crawler();
+        $crawler->addHtmlContent($html);
+
+        $this->assertFormActionButtonExists(
+            'Сохранить',
+            $crawler
+        );
+        $this->assertFormActionButtonExists(
+            'Удалить',
+            $crawler
+        );
+    }
+
+    /**
+     * @dataProvider dataProvider_TestAssertFormActionButtonExistsAndNotExists
+     *
+     * @param string $html
+     */
+    public function testsAssertFormActionButtonExists_ShouldThrowException(
+        string $html
+    ) {
+        $this->expectException(ExpectationFailedException::class);
+        $this->expectExceptionMessageMatches(
+            '.На форме нет кнопки \'Несуществующий текст кнопки\'.'
+        );
+
+        $crawler = new Crawler();
+        $crawler->addHtmlContent($html);
+
+        $this->assertFormActionButtonExists(
+            'Несуществующий текст кнопки',
+            $crawler
+        );
+    }
+
+    /**
+     * @dataProvider dataProvider_TestAssertFormActionButtonExistsAndNotExists
+     *
+     * @param string $html
+     */
+    public function testsAssertFormActionButtonNotExists_Successful(
+        string $html
+    ) {
+        $crawler = new Crawler();
+        $crawler->addHtmlContent($html);
+
+        $this->assertFormActionButtonNotExists(
+            'Несуществующий текст кнопки',
+            $crawler
+        );
+    }
+
+    /**
+     * @dataProvider dataProvider_TestAssertFormActionButtonExistsAndNotExists
+     *
+     * @param string $html
+     */
+    public function testsAssertFormActionButtonNotExists_WhenButtonType_ShouldThrowException(
+        string $html
+    ) {
+        $this->expectException(ExpectationFailedException::class);
+        $this->expectExceptionMessageMatches(
+            '.На форме есть кнопка \'Сохранить\'.'
+        );
+
+        $crawler = new Crawler();
+        $crawler->addHtmlContent($html);
+
+        $this->assertFormActionButtonNotExists(
+            'Сохранить',
+            $crawler
+        );
+    }
+
+    /**
+     * @dataProvider dataProvider_TestAssertFormActionButtonExistsAndNotExists
+     *
+     * @param string $html
+     */
+    public function testsAssertFormActionButtonNotExists_WhenLinkType_ShouldThrowException(
+        string $html
+    ) {
+        $this->expectException(ExpectationFailedException::class);
+        $this->expectExceptionMessageMatches(
+            '.На форме есть кнопка \'Удалить\'.'
+        );
+
+        $crawler = new Crawler();
+        $crawler->addHtmlContent($html);
+
+        $this->assertFormActionButtonNotExists(
+            'Удалить',
+            $crawler
+        );
+    }
+
+    public function dataProvider_SelectForm()
+    {
+        $html = <<<'HTML'
+            <form>
+                <div class="form-group">
+                    <label class="control-label required">
+                      Список
+                    </label>
+                    <div class="sonata-ba-field sonata-ba-field-standard-natural">
+                        <select
+                            class="form-control"
+                            name="sbb9cecc71b[list]"
+                        >
+                            <option value="0">Нет значения</option>
+                            <option value="1" selected>Значение</option>
+                        </select>
+                    </div>
+                </div>
+            </form>
+HTML;
+
+        return [[$html]];
+    }
+
+    /**
+     * @dataProvider dataProvider_SelectForm
+     *
+     * @param string $html
+     */
+    public function testAssertSelectFormFieldExists_Exists(string $html)
+    {
+        $crawler = new Crawler();
+        $crawler->addHtmlContent($html);
+
+        $this->assertSelectFormFieldExists(
+            'Список',
+            $crawler
+        );
+    }
+
+    /**
+     * @dataProvider dataProvider_SelectForm
+     *
+     * @param string $html
+     */
+    public function testAssertSelectFormFieldExists_NotExists(string $html)
+    {
+        $this->expectException(ExpectationFailedException::class);
+        $this->expectExceptionMessage(
+            'Не найдено поле с заголовком "Другое поле"'
+        );
+
+        $crawler = new Crawler();
+        $crawler->addHtmlContent($html);
+
+        $this->assertSelectFormFieldExists(
+            'Другое поле',
+            $crawler
+        );
+    }
+
+    /**
+     * @dataProvider dataProvider_TestAssertFormFieldValueEquals
+     *
+     * @param string $html
+     */
+    public function testAssertNumberFormFieldExists_Exists(string $html)
+    {
+        $crawler = new Crawler();
+        $crawler->addHtmlContent($html);
+
+        $this->assertFormNumberFieldExists(
+            'Продолжительность',
+            $crawler
+        );
+    }
+
+    /**
+     * @dataProvider dataProvider_TestAssertFormFieldValueEquals
+     *
+     * @param string $html
+     */
+    public function testAssertNumberFormFieldExists_NotExists(string $html)
+    {
+        $this->expectException(ExpectationFailedException::class);
+        $this->expectExceptionMessage(
+            'Не найдено поле с заголовком "Другое поле"'
+        );
+
+        $crawler = new Crawler();
+        $crawler->addHtmlContent($html);
+
+        $this->assertFormNumberFieldExists(
+            'Другое поле',
+            $crawler
+        );
+    }
+
+    /**
+     * @dataProvider dataProvider_SelectForm
+     *
+     * @param string $html
+     */
+    public function testAssertSelectFormFieldValueEquals_Equals(string $html)
+    {
+        $crawler = new Crawler();
+        $crawler->addHtmlContent($html);
+        $expectedValueThatSelected = '1';
+
+        $this->assertSelectFormFieldValueEquals(
+            $expectedValueThatSelected,
+            'Список',
+            $crawler
+        );
+    }
+
+    /**
+     * @dataProvider dataProvider_SelectForm
+     *
+     * @param string $html
+     */
+    public function testAssertSelectFormFieldValueEquals_NotEquals(string $html)
+    {
+        $this->expectException(ExpectationFailedException::class);
+        $this->expectExceptionMessage(
+            'Не найдено поле с заголовком "Список" и значением "0"'
+        );
+
+        $crawler = new Crawler();
+        $crawler->addHtmlContent($html);
+        $expectedValueThatNotSelected = '0';
+
+        $this->assertSelectFormFieldValueEquals(
+            $expectedValueThatNotSelected,
+            'Список',
+            $crawler
+        );
+    }
+
+    public function dataProvider_CheckboxForm()
+    {
+        $html = <<<'HTML'
+            <form>
+                <div class="sonata-ba-field sonata">
+                    <div class="checkbox">
+                    <label>
+                        <input type="checkbox">
+                        <span class="control-label__text">
+                            Тестовый флаг
+                        </span>
+                    </label>
+                    </div>
+                </div>
+            </form>
+HTML;
+
+        return [[$html]];
+    }
+
+    /**
+     * @dataProvider dataProvider_CheckboxForm
+     *
+     * @param string $html
+     */
+    public function testAssertFormCheckboxFieldExists_Exists(string $html)
+    {
+        $crawler = new Crawler();
+        $crawler->addHtmlContent($html);
+
+        $this->assertFormCheckboxFieldExists(
+            'Тестовый флаг',
+            $crawler
+        );
+    }
+
+    /**
+     * @dataProvider dataProvider_CheckboxForm
+     *
+     * @param string $html
+     *
+     * @todo Разобраться почему здесь используется метод assertSelectFormFieldExists
+     * @todo https://trello.com/c/xyKQRV67
+     */
+    public function testAssertFormCheckboxFieldExists_NotExists(string $html)
+    {
+        $this->expectException(ExpectationFailedException::class);
+        $this->expectExceptionMessage(
+            'Не найдено поле с заголовком "Другое поле"'
+        );
+
+        $crawler = new Crawler();
+        $crawler->addHtmlContent($html);
+
+        $this->assertSelectFormFieldExists(
+            'Другое поле',
+            $crawler
+        );
+    }
+
+    public function dataProvider_TableForm()
+    {
+        $html = <<<'HTML'
+            <form>
+                <div class="form-group">
+                    <label class="control-label">
+                        Тестовая таблица
+                    </label>
+                    <div class="sonata-ba-field">
+                        <table class="table">
+                            <tr>
+                                <td>test</td>
+                            </tr>
+                        </table>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="control-label">
+                        Тестовая таблица 1
+                    </label>
+                    <div class="sonata-ba-field">
+                        <div>
+                            <table class="table">
+                                <tr>
+                                    <td>other</td>
+                                </tr>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </form>
+HTML;
+
+        return [[$html]];
+    }
+
+    /**
+     * @dataProvider dataProvider_TableForm
+     *
+     * @param string $html
+     */
+    public function testGetSubAdminTableByItsTitle(string $html)
+    {
+        $crawler = new Crawler();
+        $crawler->addHtmlContent($html);
+
+        $tableCrawler = $this->getSubAdminTableByItsTitle('Тестовая таблица', $crawler);
+        $this->assertCount(1, $tableCrawler);
+        $this->assertEquals('test', $tableCrawler->filter('td')->text());
+
+        $tableCrawler = $this->getSubAdminTableByItsTitle('Несуществующая', $crawler);
+        $this->assertCount(0, $tableCrawler);
+    }
+
+    public function dataProvider_ErrorForm()
+    {
+        $html = <<<'HTML'
+        <form>
+            <div class="form-group has-error" id="sonata-ba-field-container-s26e8548772_code">
+                <label class="control-label required" for="s26e8548772_code">
+                    Поле с ошибкой
+                </label>
+                <div class="sonata-ba-field sonata-ba-field-standard-natural sonata-ba-field-error">
+                    <input type="text"
+                        id="s26e8548772_code" name="s26e8548772[code]"
+                        class=" form-control"
+                    >
+                    <div class="help-block sonata-ba-field-error-messages">
+                        <ul class="list-unstyled">
+                            <li>
+                                <i class="fa fa-exclamation-circle" aria-hidden="true"></i>
+                                Текст ошибки
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </form>
+HTML;
+
+        return [[$html]];
+    }
+
+    /**
+     * @dataProvider dataProvider_ErrorForm
+     *
+     * @param string $html
+     */
+    public function testAssertFormFieldContainsError_ThereIsError(string $html)
+    {
+        $crawler = new Crawler();
+        $crawler->addHtmlContent($html);
+
+        $label = 'Поле с ошибкой';
+        $error = 'Текст ошибки';
+        $this->assertFormFieldContainsError($label, $error, $crawler);
+    }
+
+    /**
+     * @dataProvider dataProvider_ErrorForm
+     *
+     * @param string $html
+     */
+    public function testAssertFormFieldContainsError_ThereIsNoSuchField(string $html)
+    {
+        $crawler = new Crawler();
+        $crawler->addHtmlContent($html);
+
+        $label = 'Несуществующее поле';
+        $error = 'Текст ошибки';
+
+        $this->expectException(ExpectationFailedException::class);
+        $this->expectExceptionMessage(
+            'Не удалось однозначно найти такое поле с ошибками'
+        );
+        $this->assertFormFieldContainsError($label, $error, $crawler);
+    }
+
+    /**
+     * @dataProvider dataProvider_ErrorForm
+     *
+     * @param string $html
+     */
+    public function testAssertFormFieldContainsError_ThereIsNoSuchError(string $html)
+    {
+        $crawler = new Crawler();
+        $crawler->addHtmlContent($html);
+
+        $label = 'Поле с ошибкой';
+        $error = 'Другая ошибка';
+
+        $this->expectException(ExpectationFailedException::class);
+        $this->expectExceptionMessage(
+            'Ошибка не равна ожидаемой'
+        );
+        $this->assertFormFieldContainsError($label, $error, $crawler);
+    }
+}
