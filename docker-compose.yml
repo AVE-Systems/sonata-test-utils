@@ -2,7 +2,6 @@ version: '3'
 
 services:
   php:
-#    image: php:7.2-cli
     build: ./docker/php
     volumes:
       - .:/usr/share/php

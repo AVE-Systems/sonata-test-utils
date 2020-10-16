@@ -10,8 +10,3 @@ RUN pecl install xdebug-2.6.1 \
     && echo xdebug.remote_enable=1 >> docker-php-ext-xdebug.ini \
     && echo xdebug.remote_host=host.docker.internal >> docker-php-ext-xdebug.ini \
     && echo xdebug.idekey=${XDEBUG_IDEKEY:-PHPSTORM} >> docker-php-ext-xdebug.ini
-
-#RUN useradd -m docker-php --uid=1000
-
-#USER 1000:1000
-
