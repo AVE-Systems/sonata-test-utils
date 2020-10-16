@@ -8,7 +8,8 @@
     сущностей.
     - SonataAdminMenuTraitTest для тестирования вертикального меню.
     - SonataAdminFlashMessagesTraitTest для тестирования всплывающих сообщений.
-    - SonataAdminActionsTraitTest для тестирования ???
+    - SonataAdminActionsTraitTest для тестирования элементов во вкладке
+    "Действия"
     - SonataAdminListBatchActionsTraitTest для тестирования общих действий на
     странице списка сущностей.
     - SonataAdminTabTraitTest для тестирования вкладок.
