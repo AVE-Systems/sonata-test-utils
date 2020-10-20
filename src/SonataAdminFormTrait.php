@@ -14,10 +14,14 @@ use Symfony\Component\DomCrawler\Crawler;
  * @method void assertCount(int $expectedCount, $haystack, string $message = '')
  * @method void assertThat($value, Constraint $constraint, string $message = '')
  * @method void assertStringContainsString(string $string, string $haystack, string $message = '')
+ * @method void assertEquals(mixed $expected, mixed $actual, string $message = '')
+ * @method void assertTrue(mixed $condition, string $message = '')
  *
  * @see Assert::assertCount
  * @see Assert::assertThat
  * @see Assert::assertStringContainsString
+ * @see Assert::assertEquals
+ * @see Assert::assertTrue
  */
 trait SonataAdminFormTrait
 {
@@ -203,6 +207,45 @@ trait SonataAdminFormTrait
     }
 
     /**
+     * Проверяет, что заданное поле в виде checkbox существует на форме и
+     * находится во включенном состоянии.
+     *
+     * @todo покрыть тестами https://trello.com/c/Zq1dZr7c
+     *
+     * @param string  $label
+     * @param Crawler $form
+     */
+    private function assertFormCheckboxFieldExistsAndChecked(
+        string $label,
+        Crawler $form
+    ) {
+        $message = sprintf(
+            'Не найдено поле с заголовком "%s"',
+            $label
+        );
+
+        $inputXPath = "//{$this->getFormCheckboxFieldXPath($label)}";
+
+        $element = $form->filterXPath($inputXPath);
+
+        $this->assertCount(
+            1,
+            $element,
+            $message
+        );
+
+        $checkedMessage = sprintf(
+            'Поле с заголовком "%s" не установлено во включенное состояние',
+            $label
+        );
+
+        $this->assertTrue(
+            !!$element->attr('checked'),
+            $checkedMessage
+        );
+    }
+
+    /**
      * Возвращает XPath-путь к флажковому полю формы с заданным заголовком.
      *
      * @param string $label
@@ -301,6 +344,56 @@ trait SonataAdminFormTrait
             $form->filterXPath($selectXPath),
             $message
         );
+    }
+
+    /**
+     * Проверяет, что значение в списковом поле с данным заголовком существует
+     * в форме.
+     *
+     * @param string  $selectLabel наименование поля
+     * @param string  $optionTitle заголовок значения
+     * @param Crawler $form        ссылка на краулер по форме
+     *
+     * @todo покрыть тестами https://trello.com/c/NOavVvev
+     */
+    protected function assertSelectOptionExists(
+        string $selectLabel,
+        string $optionTitle,
+        Crawler $form
+    ) {
+        $message = sprintf(
+            'Не найдено значение "%s" в поле с заголовком "%s"',
+            $optionTitle,
+            $selectLabel
+        );
+
+        $selectOptionXPath = $this->getSelectOptionXPath(
+            $selectLabel,
+            $optionTitle
+        );
+
+        $this->assertCount(
+            1,
+            $form->filterXPath($selectOptionXPath),
+            $message
+        );
+    }
+
+    /**
+     * Возвращает XPath-путь к опции в списковом поле с заданными заголовками
+     * поля и значения.
+     *
+     * @param string $selectLabel
+     * @param string $optionTitle
+     *
+     * @return string
+     */
+    private function getSelectOptionXPath(
+        string $selectLabel,
+        string $optionTitle
+    ): string {
+        return "//{$this->getSelectFieldXPath($selectLabel)}".
+            "/option[text() = '$optionTitle']";
     }
 
     /**
