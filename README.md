@@ -16,8 +16,8 @@
 
 Для запуска тестов сначала необходимо установить зависимости через composer
 
-`composer install`
+`docker-compose run php composer install`
 
 После запустить тесты
 
-`vendor/bin/phpunit tests/`
+`docker-compose run php vendor/bin/phpunit tests/`
