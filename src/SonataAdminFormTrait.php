@@ -210,8 +210,6 @@ trait SonataAdminFormTrait
      * Проверяет, что заданное поле в виде checkbox существует на форме и
      * находится во включенном состоянии.
      *
-     * @todo покрыть тестами https://trello.com/c/Zq1dZr7c
-     *
      * @param string  $label
      * @param Crawler $form
      */

@@ -478,6 +478,16 @@ HTML;
                     </label>
                     </div>
                 </div>
+                <div class="sonata-ba-field sonata">
+                    <div class="checkbox">
+                    <label>
+                        <input type="checkbox" checked>
+                        <span class="control-label__text">
+                            Выбранный флаг
+                        </span>
+                    </label>
+                    </div>
+                </div>
             </form>
 HTML;
 
@@ -519,6 +529,68 @@ HTML;
         $crawler->addHtmlContent($html);
 
         $this->assertSelectFormFieldExists(
+            'Другое поле',
+            $crawler
+        );
+    }
+
+    /**
+     * @dataProvider dataProvider_CheckboxForm
+     *
+     * @param string $html
+     */
+    public function testAssertFormCheckboxFieldExistsAndChecked_Checked(
+        string $html
+    ) {
+        $crawler = new Crawler();
+        $crawler->addHtmlContent($html);
+
+        $this->assertFormCheckboxFieldExistsAndChecked(
+            'Выбранный флаг',
+            $crawler
+        );
+    }
+
+    /**
+     * @dataProvider dataProvider_CheckboxForm
+     *
+     * @param string $html
+     */
+    public function testAssertFormCheckboxFieldExistsAndChecked_ExistsButNotChecked(
+        string $html
+    ) {
+        $this->expectException(ExpectationFailedException::class);
+        $this->expectExceptionMessage(
+            'Поле с заголовком "Тестовый флаг" не установлено во включенное '.
+            'состояние'
+        );
+
+        $crawler = new Crawler();
+        $crawler->addHtmlContent($html);
+
+        $this->assertFormCheckboxFieldExistsAndChecked(
+            'Тестовый флаг',
+            $crawler
+        );
+    }
+
+    /**
+     * @dataProvider dataProvider_CheckboxForm
+     *
+     * @param string $html
+     */
+    public function testAssertFormCheckboxFieldExistsAndChecked_NotExists(
+        string $html
+    ) {
+        $this->expectException(ExpectationFailedException::class);
+        $this->expectExceptionMessage(
+            'Не найдено поле с заголовком "Другое поле"'
+        );
+
+        $crawler = new Crawler();
+        $crawler->addHtmlContent($html);
+
+        $this->assertFormCheckboxFieldExistsAndChecked(
             'Другое поле',
             $crawler
         );
