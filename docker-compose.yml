@@ -1,0 +1,8 @@
+version: '3'
+
+services:
+  php:
+    build: ./docker/php
+    volumes:
+      - .:/usr/share/php
+    working_dir: /usr/share/php
