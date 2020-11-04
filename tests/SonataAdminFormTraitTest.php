@@ -614,7 +614,7 @@ HTML;
 
         $crawler = new Crawler();
         $crawler->addHtmlContent($html);
-        $expectedValues = ['0' ,'1', '4'];
+        $expectedValues = ['0', '1', '4'];
 
         $this->assertMultipleSelectFormFieldWithAutocompleteValueEquals(
             $expectedValues,

@@ -438,7 +438,7 @@ trait SonataAdminFormTrait
 
     /**
      * Проверяет, что поле множественного выбора с автокомплитом имеет
-     * ожидаемые значения.
+     * ожидаемые значения и не имеет лишних значений.
      *
      * @param string[]  $expectedValues ожидаемые значения
      * @param string    $label          наименование поля
@@ -500,6 +500,8 @@ trait SonataAdminFormTrait
         $inputContainerXPath = "div[contains(@class, 'sonata-ba-field')]";
         $inputXPath = "select";
 
+        // Ищем такой путь, потому что соната не помечает явным образом
+        // select с автокомплитом.
         return "$labelXPath/following-sibling::{$inputContainerXPath}//{$inputXPath}";
     }
 
