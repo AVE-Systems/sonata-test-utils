@@ -387,6 +387,52 @@ HTML;
     }
 
     /**
+     * @dataProvider dataProvider_SelectForm
+     *
+     * @param string $html
+     */
+    public function testAssertSelectOptionExists_Exists(string $html)
+    {
+        $crawler = new Crawler();
+        $crawler->addHtmlContent($html);
+
+        $this->assertSelectOptionExists(
+            'Список',
+            'Нет значения',
+            $crawler
+        );
+
+        $this->assertSelectOptionExists(
+            'Список',
+            'Значение',
+            $crawler
+        );
+    }
+
+    /**
+     * @dataProvider dataProvider_SelectForm
+     *
+     * @param string $html
+     */
+    public function testAssertSelectOptionExists_NotExists(string $html)
+    {
+        $this->expectException(ExpectationFailedException::class);
+        $this->expectExceptionMessage(
+            'Не найдено значение "Не существующий выбор" в поле с заголовком '.
+            '"Список"'
+        );
+
+        $crawler = new Crawler();
+        $crawler->addHtmlContent($html);
+
+        $this->assertSelectOptionExists(
+            'Список',
+            'Не существующий выбор',
+            $crawler
+        );
+    }
+
+    /**
      * @dataProvider dataProvider_TestAssertFormFieldValueEquals
      *
      * @param string $html
