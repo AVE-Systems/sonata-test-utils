@@ -16,6 +16,38 @@ use Symfony\Component\DomCrawler\Crawler;
 trait SonataAdminMenuTrait
 {
     /**
+     * Проверяет, что список меню присутствует на странице.
+     *
+     * @param Crawler $crawler
+     */
+    protected function assertMenuExists(Crawler $crawler)
+    {
+        $menuXPath = $this->getMenuXPath();
+
+        $this->assertCount(
+            1,
+            $crawler->filterXPath('//'.$menuXPath),
+            'Не найдено меню на странице'
+        );
+    }
+
+    /**
+     * Проверяет, что список меню отсутствует на странице.
+     *
+     * @param Crawler $crawler
+     */
+    protected function assertMenuNotExists(Crawler $crawler)
+    {
+        $menuXPath = $this->getMenuXPath();
+
+        $this->assertCount(
+            0,
+            $crawler->filterXPath('//'.$menuXPath),
+            'Меню присутствует на странице'
+        );
+    }
+
+    /**
      * Проверяет, что пункт с заданным названием в списке меню.
      *
      * @param Crawler $crawler
@@ -91,7 +123,7 @@ trait SonataAdminMenuTrait
      *
      * @return string
      */
-    protected function getMenuItemInGroupXPath(
+    private function getMenuItemInGroupXPath(
         string $menuGroup,
         string $menuItem
     ): string {

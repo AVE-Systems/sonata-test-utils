@@ -352,8 +352,6 @@ trait SonataAdminFormTrait
      * @param string  $selectLabel наименование поля
      * @param string  $optionTitle заголовок значения
      * @param Crawler $form        ссылка на краулер по форме
-     *
-     * @todo покрыть тестами https://trello.com/c/NOavVvev
      */
     protected function assertSelectOptionExists(
         string $selectLabel,
