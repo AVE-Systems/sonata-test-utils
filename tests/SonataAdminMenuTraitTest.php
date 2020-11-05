@@ -11,6 +11,20 @@ class SonataAdminMenuTraitTest extends TestCase
 {
     use SonataAdminMenuTrait;
 
+    public function dataProvider_MenuNotExists()
+    {
+        $html = <<<'HTML'
+<html>
+    <body>
+      <div class="wrapper">
+      </div>
+    </body>
+</html>
+HTML;
+
+        return [[$html]];
+    }
+
     public function dataProvider_TestAssertMenuItem()
     {
         $html = <<<'HTML'
@@ -60,6 +74,72 @@ class SonataAdminMenuTraitTest extends TestCase
 HTML;
 
         return [[$html]];
+    }
+
+    /**
+     * @dataProvider dataProvider_MenuNotExists
+     *
+     * @param string $html
+     */
+    public function testAssertMenuExists_ShouldThrowException(
+        string $html
+    ) {
+        $this->expectException(ExpectationFailedException::class);
+        $this->expectExceptionMessageMatches(
+            '.Не найдено меню на странице.'
+        );
+
+        $crawler = new Crawler();
+        $crawler->addHtmlContent($html);
+
+        $this->assertMenuExists($crawler);
+    }
+
+    /**
+     * @dataProvider dataProvider_TestAssertMenuItem
+     *
+     * @param string $html
+     */
+    public function testAssertMenuExists_ShouldNotThrowException(
+        string $html
+    ) {
+        $crawler = new Crawler();
+        $crawler->addHtmlContent($html);
+
+        $this->assertMenuExists($crawler);
+    }
+
+    /**
+     * @dataProvider dataProvider_TestAssertMenuItem
+     *
+     * @param string $html
+     */
+    public function testAssertMenuNotExists_ShouldThrowException(
+        string $html
+    ) {
+        $this->expectException(ExpectationFailedException::class);
+        $this->expectExceptionMessageMatches(
+            '.Меню присутствует на странице.'
+        );
+
+        $crawler = new Crawler();
+        $crawler->addHtmlContent($html);
+
+        $this->assertMenuNotExists($crawler);
+    }
+
+    /**
+     * @dataProvider dataProvider_MenuNotExists
+     *
+     * @param string $html
+     */
+    public function testAssertMenuNotExists_ShouldNotThrowException(
+        string $html
+    ) {
+        $crawler = new Crawler();
+        $crawler->addHtmlContent($html);
+
+        $this->assertMenuNotExists($crawler);
     }
 
     /**
