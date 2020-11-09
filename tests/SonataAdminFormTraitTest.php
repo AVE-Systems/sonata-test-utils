@@ -168,6 +168,43 @@ HTML;
      *
      * @param string $html
      */
+    public function testAssertNumberFormFieldExists_Exists(string $html)
+    {
+        $crawler = new Crawler();
+        $crawler->addHtmlContent($html);
+
+        $this->assertFormNumberFieldExists(
+            'Продолжительность',
+            $crawler
+        );
+    }
+
+    /**
+     * @dataProvider dataProvider_TestAssertFormFieldValueEquals
+     *
+     * @param string $html
+     */
+    public function testAssertNumberFormFieldExists_NotExists(string $html)
+    {
+        $this->expectException(ExpectationFailedException::class);
+        $this->expectExceptionMessage(
+            'Не найдено поле с заголовком "Другое поле"'
+        );
+
+        $crawler = new Crawler();
+        $crawler->addHtmlContent($html);
+
+        $this->assertFormNumberFieldExists(
+            'Другое поле',
+            $crawler
+        );
+    }
+
+    /**
+     * @dataProvider dataProvider_TestAssertFormFieldValueEquals
+     *
+     * @param string $html
+     */
     public function testAssertFormTextareaFieldValueEquals_ShouldThrowException(
         string $html
     ) {
@@ -433,43 +470,6 @@ HTML;
     }
 
     /**
-     * @dataProvider dataProvider_TestAssertFormFieldValueEquals
-     *
-     * @param string $html
-     */
-    public function testAssertNumberFormFieldExists_Exists(string $html)
-    {
-        $crawler = new Crawler();
-        $crawler->addHtmlContent($html);
-
-        $this->assertFormNumberFieldExists(
-            'Продолжительность',
-            $crawler
-        );
-    }
-
-    /**
-     * @dataProvider dataProvider_TestAssertFormFieldValueEquals
-     *
-     * @param string $html
-     */
-    public function testAssertNumberFormFieldExists_NotExists(string $html)
-    {
-        $this->expectException(ExpectationFailedException::class);
-        $this->expectExceptionMessage(
-            'Не найдено поле с заголовком "Другое поле"'
-        );
-
-        $crawler = new Crawler();
-        $crawler->addHtmlContent($html);
-
-        $this->assertFormNumberFieldExists(
-            'Другое поле',
-            $crawler
-        );
-    }
-
-    /**
      * @dataProvider dataProvider_SelectForm
      *
      * @param string $html
@@ -506,6 +506,165 @@ HTML;
         $this->assertSelectFormFieldValueEquals(
             $expectedValueThatNotSelected,
             'Список',
+            $crawler
+        );
+    }
+
+    public function dataProvider_MultipleSelectFormWithAutocomplete()
+    {
+        $html = <<<'HTML'
+            <form>
+                <div class="form-group">
+                    <label class="control-label">
+                      Разрешенные пользователи
+                    </label>
+                    <div class="sonata-ba-field sonata-ba-field-standard-natural">
+                        <input type="text" id="s5f9c101b7577a_allowedUsers_autocomplete_input" value="" class="" />
+                        <select id="s5f9c101b7577a_allowedUsers_autocomplete_input_v4" data-sonata-select2="false">
+                            <option value="1" selected>user1@yandex.ru</option>
+                            <option value="2" selected>user2@yandex.ru</option>
+                            <option value="3" selected>user3@yandex.ru</option>
+                        </select>
+                        <div id="s5f9c101b7577a_allowedUsers_hidden_inputs_wrap">
+                            <input type="hidden" name="s5f9c101b7577a[allowedUsers][]" value="1">
+                            <input type="hidden" name="s5f9c101b7577a[allowedUsers][]" value="2">
+                            <input type="hidden" name="s5f9c101b7577a[allowedUsers][]" value="3">
+                        </div>
+                        <div id="field_actions_s5f9c101b7577a_allowedUsers" class="field-actions"></div>
+                    </div>
+                </div>
+            </form>
+HTML;
+
+        return [[$html]];
+    }
+
+    /**
+     * @dataProvider dataProvider_MultipleSelectFormWithAutocomplete
+     *
+     * @param string $html
+     */
+    public function testAssertMultipleSelectFormFieldWithAutocompleteExists_Exists(
+        string $html
+    ) {
+        $crawler = new Crawler();
+        $crawler->addHtmlContent($html);
+
+        $this->assertMultipleSelectFormFieldWithAutocompleteExists(
+            'Разрешенные пользователи',
+            $crawler
+        );
+    }
+
+    /**
+     * @dataProvider dataProvider_MultipleSelectFormWithAutocomplete
+     *
+     * @param string $html
+     */
+    public function testAssertMultipleSelectFormFieldWithAutocompleteExists_NotExists(
+        string $html
+    ) {
+        $this->expectException(ExpectationFailedException::class);
+        $this->expectExceptionMessage(
+            'Не найдено поле с заголовком "Другое поле"'
+        );
+
+        $crawler = new Crawler();
+        $crawler->addHtmlContent($html);
+
+        $this->assertMultipleSelectFormFieldWithAutocompleteExists(
+            'Другое поле',
+            $crawler
+        );
+    }
+
+    /**
+     * @dataProvider dataProvider_MultipleSelectFormWithAutocomplete
+     *
+     * @param string $html
+     */
+    public function testAssertMultipleSelectFormFieldWithAutocompleteValueEquals_Equals(
+        string $html
+    ) {
+        $crawler = new Crawler();
+        $crawler->addHtmlContent($html);
+        $expectedValueThatSelected = ['2', '1', '3'];
+
+        $this->assertMultipleSelectFormFieldWithAutocompleteValueEquals(
+            $expectedValueThatSelected,
+            'Разрешенные пользователи',
+            $crawler
+        );
+    }
+
+    /**
+     * @dataProvider dataProvider_MultipleSelectFormWithAutocomplete
+     *
+     * @param string $html
+     */
+    public function testAssertMultipleSelectFormFieldWithAutocompleteValueEquals_NotEquals_NotFound(
+        string $html
+    ) {
+        $this->expectException(ExpectationFailedException::class);
+        $this->expectExceptionMessage(
+            'В поле с заголовком "Разрешенные пользователи" не найдены значения "0", "4"'
+        );
+
+        $crawler = new Crawler();
+        $crawler->addHtmlContent($html);
+        $expectedValues = ['0', '1', '2', '3', '4'];
+
+        $this->assertMultipleSelectFormFieldWithAutocompleteValueEquals(
+            $expectedValues,
+            'Разрешенные пользователи',
+            $crawler
+        );
+    }
+
+    /**
+     * @dataProvider dataProvider_MultipleSelectFormWithAutocomplete
+     *
+     * @param string $html
+     */
+    public function testAssertMultipleSelectFormFieldWithAutocompleteValueEquals_NotEquals_ExtraFound(
+        string $html
+    ) {
+        $this->expectException(ExpectationFailedException::class);
+        $this->expectExceptionMessage(
+            'В поле с заголовком "Разрешенные пользователи" найдены лишние значения "2", "3"'
+        );
+
+        $crawler = new Crawler();
+        $crawler->addHtmlContent($html);
+        $expectedValues = ['1'];
+
+        $this->assertMultipleSelectFormFieldWithAutocompleteValueEquals(
+            $expectedValues,
+            'Разрешенные пользователи',
+            $crawler
+        );
+    }
+
+    /**
+     * @dataProvider dataProvider_MultipleSelectFormWithAutocomplete
+     *
+     * @param string $html
+     */
+    public function testAssertMultipleSelectFormFieldWithAutocompleteValueEquals_NotEquals_NotFoundAndExtraFound(
+        string $html
+    ) {
+        $this->expectException(ExpectationFailedException::class);
+        $this->expectExceptionMessage(
+            'В поле с заголовком "Разрешенные пользователи" не найдены значения "0", "4" и найдены лишние значения "2", "3"'
+        );
+
+        $crawler = new Crawler();
+        $crawler->addHtmlContent($html);
+        $expectedValues = ['0', '1', '4'];
+
+        $this->assertMultipleSelectFormFieldWithAutocompleteValueEquals(
+            $expectedValues,
+            'Разрешенные пользователи',
             $crawler
         );
     }

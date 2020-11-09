@@ -2,6 +2,7 @@
 
 namespace AveSystems\SonataTestUtils;
 
+use DOMElement;
 use PHPUnit\Framework\Constraint\Constraint;
 use PHPUnit\Framework\Constraint\IsEqual;
 use Symfony\Component\DomCrawler\Crawler;
@@ -409,6 +410,100 @@ trait SonataAdminFormTrait
     }
 
     /**
+     * Проверяет, что поле множественного выбора с автокомплитом с данным
+     * заголовком существует в форме.
+     *
+     * @param string  $label наименование поля
+     * @param Crawler $form  ссылка на краулер по форме
+     */
+    protected function assertMultipleSelectFormFieldWithAutocompleteExists(
+        string $label,
+        Crawler $form
+    ) {
+        $message = sprintf(
+            'Не найдено поле с заголовком "%s"',
+            $label
+        );
+
+        $selectXPath = "//{$this->getSelectFormFieldWithAutocompleteXPath($label)}";
+
+        $this->assertCount(
+            1,
+            $form->filterXPath($selectXPath),
+            $message
+        );
+    }
+
+    /**
+     * Проверяет, что поле множественного выбора с автокомплитом имеет
+     * ожидаемые значения и не имеет лишних значений.
+     *
+     * @param string[]  $expectedValues ожидаемые значения
+     * @param string    $label          наименование поля
+     * @param Crawler   $form           ссылка на краулер по форме
+     */
+    protected function assertMultipleSelectFormFieldWithAutocompleteValueEquals(
+        array $expectedValues,
+        string $label,
+        Crawler $form
+    ) {
+        $message = sprintf(
+            'В поле с заголовком "%s" ',
+            $label
+        );
+
+        $selectXPath = "//{$this->getSelectFormFieldWithAutocompleteXPath($label)}";
+
+        $selectElement = $form->filterXPath($selectXPath)->first();
+        $values = $this->getSelectedValuesFromSelect($selectElement);
+
+        $notFound = array_diff($expectedValues, $values);
+        $extraFound = array_diff($values, $expectedValues);
+
+        $additionalMessages = [];
+        if (!empty($notFound)) {
+            $additionalMessages[] = sprintf(
+                'не найдены значения %s',
+                $this->formatArrayValues($notFound)
+            );
+        }
+
+        if (!empty($extraFound)) {
+            $additionalMessages[] = sprintf(
+                'найдены лишние значения %s',
+                $this->formatArrayValues($extraFound)
+            );
+        }
+
+        $message .= implode(' и ', $additionalMessages);
+
+        $this->assertTrue(
+            empty($notFound) && empty($extraFound),
+            $message
+        );
+    }
+
+    /**
+     * Возвращает XPath-путь к поле множественного выбора с автокомплитом с
+     * заданным заголовком.
+     *
+     * @param string $label
+     *
+     * @return string
+     */
+    private function getSelectFormFieldWithAutocompleteXPath(
+        string $label
+    ): string {
+        $labelXPath = $this->getFormFieldLabelXPath($label);
+        $inputContainerXPath = "div[contains(@class, 'sonata-ba-field')]";
+        $inputXPath = "select";
+
+        // Ищем такой путь, потому что соната не помечает явным образом
+        // select с автокомплитом.
+        return "$labelXPath/following-sibling::{$inputContainerXPath}//{$inputXPath}";
+    }
+
+    /**
      * Возвращает XPath-путь к заданному заголовку поля формы.
      *
      * @param string $label
@@ -599,7 +694,7 @@ trait SonataAdminFormTrait
     }
 
     /**
-     * Получает значение выбранного элемента выпающего списка.
+     * Получает значение выбранного элемента выпадающего списка.
      *
      * @param Crawler $selectElement корневым элементом должен быть select
      *
@@ -641,6 +736,47 @@ trait SonataAdminFormTrait
             $error,
             $errorsContainer->text(),
             'Ошибка не равна ожидаемой'
+        );
+    }
+
+    /**
+     * Получает список значений выбранных элементов выпадающего списка.
+     *
+     * @param Crawler $selectElement корневым элементом должен быть select
+     *
+     * @return string[]
+     */
+    private function getSelectedValuesFromSelect(Crawler $selectElement): array
+    {
+        $result = [];
+
+        /**
+         * @var DOMElement $selectedOption
+         */
+        foreach ($selectElement->children('option[selected]') as $selectedOption) {
+            $result[] = trim($selectedOption->getAttribute('value'));
+        }
+
+        return $result;
+    }
+
+    /**
+     * Форматирует значения массива для удобного отображения в тексте ошибки.
+     *
+     * @param array $data
+     *
+     * @return string
+     */
+    private function formatArrayValues(array $data): string
+    {
+        return implode(
+            ', ',
+            array_map(
+                function($value) {
+                    return '"' . $value . '"';
+                },
+                $data
+            )
         );
     }
 }
