@@ -2,10 +2,29 @@
   "name": "ave-systems/sonata-test-utils",
   "description": "Utils for testing SonataAdminBundle",
   "homepage": "https://github.com/AVE-Systems/sonata-test-utils",
+  "version": "0.1.0",
   "type": "library",
+  "authors": [
+    {
+      "name": "Artem Burykin",
+      "email": "nisoartem@gmail.com"
+    },
+    {
+      "name": "Natalya Lee",
+      "email": "pro.nata90@yandex.ru"
+    },
+    {
+      "name": "Evgeniya Zemlyanskaya",
+      "email": "andomiell@mail.ru"
+    },
+    {
+      "name": "Aleksey Shimolin",
+      "email": "ashimolin@yandex.ru"
+    }
+  ],
   "minimum-stability": "stable",
   "keywords": [
-    "trait", "php7", "helper"
+    "trait", "php7", "helper", "sonata-admin", "testing"
   ],
   "require": {
     "php": "^7.2",
