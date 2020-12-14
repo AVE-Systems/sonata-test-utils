@@ -2,10 +2,10 @@
 
 namespace Tests;
 
+use AveSystems\SonataTestUtils\SonataAdminMenuTrait;
 use PHPUnit\Framework\ExpectationFailedException;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\DomCrawler\Crawler;
-use AveSystems\SonataTestUtils\SonataAdminMenuTrait;
 
 class SonataAdminMenuTraitTest extends TestCase
 {
@@ -51,10 +51,27 @@ HTML;
                       </a>      
                     </li>
                     <li class="last">
-                      <a href="/stakeholderagent/list">
-                        <i class="fa fa-angle-double-right" aria-hidden="true"></i>
-                        Представители учредителя
+                      <a href="#">
+                        <i class="fa fa-sitemap"></i>
+                        <span>Представители учредителя</span>
+                        <span class="pull-right-container">
+                          <i class="fa pull-right fa-angle-left"></i>
+                        </span>
                       </a>
+                      <ul class="active treeview-menu menu_level_1">
+                        <li class="first">
+                          <a href="/managerialcouncil/create">
+                            <i class="fa fa-angle-double-right" aria-hidden="true"></i>
+                            Создать новый
+                          </a>      
+                        </li>
+                        <li class="last">
+                          <a href="/stakeholderagent/list">
+                            <i class="fa fa-angle-double-right" aria-hidden="true"></i>
+                            Показать список
+                          </a>
+                        </li>  
+                      </ul>
                     </li>  
                   </ul>
                 </li>
@@ -288,6 +305,154 @@ HTML;
             $crawler,
             'Адрес поддержки',
             'Управляющий совет'
+        );
+    }
+
+    /**
+     * @dataProvider dataProvider_TestAssertMenuItem
+     *
+     * @param string $html
+     */
+    public function testAssertMenuItemsEqual_ShouldNotThrowException(
+        string $html
+    ) {
+        $crawler = new Crawler();
+        $crawler->addHtmlContent($html);
+
+        $this->assertMenuItemsEqual(
+            $crawler,
+            [
+                'Управляющий совет' => [
+                    'Информация о заседаниях',
+                    'Представители учредителя' => [
+                        'Создать новый',
+                        'Показать список',
+                    ],
+                ],
+                'Адрес поддержки',
+            ]
+        );
+    }
+
+    /**
+     * @dataProvider dataProvider_TestAssertMenuItem
+     *
+     * @param string $html
+     */
+    public function testAssertMenuItemsEqual_ShouldThrowException_InvalidItemPositionInGroup(
+        string $html
+    ) {
+        $crawler = new Crawler();
+        $crawler->addHtmlContent($html);
+
+        $this->expectException(ExpectationFailedException::class);
+        $this->expectExceptionMessageMatches(
+            '.Не совпадает порядок пунктов меню.'
+        );
+
+        $this->assertMenuItemsEqual(
+            $crawler,
+            [
+                'Управляющий совет' => [
+                    'Представители учредителя' => [
+                        'Создать новый',
+                        'Показать список',
+                    ],
+                    'Информация о заседаниях', // должен быть выше
+                ],
+                'Адрес поддержки',
+            ]
+        );
+    }
+
+    /**
+     * @dataProvider dataProvider_TestAssertMenuItem
+     *
+     * @param string $html
+     */
+    public function testAssertMenuItemsEqual_ShouldThrowException_InvalidRootItemPosition(
+        string $html
+    ) {
+        $crawler = new Crawler();
+        $crawler->addHtmlContent($html);
+
+        $this->expectException(ExpectationFailedException::class);
+        $this->expectExceptionMessageMatches(
+            '.Не совпадает порядок пунктов меню.'
+        );
+
+        $this->assertMenuItemsEqual(
+            $crawler,
+            [
+                'Адрес поддержки', // должен быть ниже
+                'Управляющий совет' => [
+                    'Информация о заседаниях',
+                    'Представители учредителя' => [
+                        'Создать новый',
+                        'Показать список',
+                    ],
+                ],
+            ]
+        );
+    }
+
+    /**
+     * @dataProvider dataProvider_TestAssertMenuItem
+     *
+     * @param string $html
+     */
+    public function testAssertMenuItemsEqual_ShouldThrowException_MissingItemInGroup(
+        string $html
+    ) {
+        $crawler = new Crawler();
+        $crawler->addHtmlContent($html);
+
+        $this->expectException(ExpectationFailedException::class);
+        $this->expectExceptionMessageMatches(
+            '.Failed asserting that two arrays are equal.'
+        );
+
+        $this->assertMenuItemsEqual(
+            $crawler,
+            [
+                'Управляющий совет' => [
+                    'Информация о заседаниях',
+                    // отсутствует пункт меню
+                ],
+                'Адрес поддержки',
+            ]
+        );
+    }
+
+    /**
+     * @dataProvider dataProvider_TestAssertMenuItem
+     *
+     * @param string $html
+     */
+    public function testAssertMenuItemsEqual_ShouldThrowException_ExtraItemInGroup(
+        string $html
+    ) {
+        $crawler = new Crawler();
+        $crawler->addHtmlContent($html);
+
+        $this->expectException(ExpectationFailedException::class);
+        $this->expectExceptionMessageMatches(
+            '.Failed asserting that two arrays are equal.'
+        );
+
+        $this->assertMenuItemsEqual(
+            $crawler,
+            [
+                'Адрес поддержки',
+                'Управляющий совет' => [
+                    'Информация о заседаниях',
+                    'Представители учредителя' => [
+                        'Создать новый',
+                        'Показать список',
+                        'Импортировать',
+                    ],
+                ],
+            ]
         );
     }
 }

@@ -89,6 +89,14 @@ trait SonataAdminMenuTrait
         );
     }
 
+    /**
+     * Проверяет, что пункт с заданным названием есть в определённой группе
+     * меню.
+     *
+     * @param Crawler $crawler
+     * @param string  $menuItem  название пункта меню
+     * @param string  $menuGroup название группы меню
+     */
     protected function assertMenuItemInGroupExists(
         Crawler $crawler,
         string $menuItem,
@@ -103,6 +111,14 @@ trait SonataAdminMenuTrait
         );
     }
 
+    /**
+     * Проверяет, что пункта с заданным названием нет в определённой группе
+     * меню.
+     *
+     * @param Crawler $crawler
+     * @param string  $menuItem  название пункта меню
+     * @param string  $menuGroup название группы меню
+     */
     protected function assertMenuItemInGroupNotExists(
         Crawler $crawler,
         string $menuItem,
@@ -114,6 +130,61 @@ trait SonataAdminMenuTrait
             0,
             $crawler->filterXPath($xpath),
             sprintf('В группе меню "%s" есть пункт "%s"', $menuGroup, $menuItem)
+        );
+    }
+
+    /**
+     * Проверяет, что названия пунктов меню и иерархия соответствуют
+     * переданному значению.
+     *
+     * @param Crawler $crawler
+     * @param array   $expectedMenuHierarchyLabels
+     *
+     * @example [
+     *   'Управленческий совет' => [
+     *     'Информация о заседаниях',
+     *     'Представители учредителя',
+     *   ],
+     *   'Справки директоров',
+     * ]
+     */
+    protected function assertMenuItemsEqual(
+        Crawler $crawler,
+        array $expectedMenuHierarchyLabels
+    ) {
+        $menuXPath = "//{$this->getMenuXPath()}";
+        $menu = $crawler->filterXPath($menuXPath);
+
+        $actualMenuHierarchyLabels = $this->retrieveMenuLabels($menu);
+
+        $this->assertEquals(
+            $expectedMenuHierarchyLabels,
+            $actualMenuHierarchyLabels
+        );
+
+        // При сравнении ассоциативных массивов, не учитывается порядок ключей,
+        // поэтому нужна дополнительная проверка
+        $expectedOrderedKeys = [];
+        $actualOrderedKeys = [];
+
+        array_walk_recursive(
+            $expectedMenuHierarchyLabels,
+            function ($value, $key) use (&$expectedOrderedKeys) {
+                $expectedOrderedKeys[] = $key;
+            }
+        );
+
+        array_walk_recursive(
+            $actualMenuHierarchyLabels,
+            function ($value, $key) use (&$actualOrderedKeys) {
+                $actualOrderedKeys[] = $key;
+            }
+        );
+
+        $this->assertEquals(
+            $expectedOrderedKeys,
+            $actualOrderedKeys,
+            'Не совпадает порядок пунктов меню'
         );
     }
 
@@ -183,5 +254,43 @@ trait SonataAdminMenuTrait
     private function getMenuItemXPath(string $menuItem)
     {
         return "li//a[normalize-space()='{$menuItem}']";
+    }
+
+    /**
+     * Обходит меню, переданное в первом параметре, и помещает названия пунктов
+     * во второй параметр в соответствии с иерархией.
+     *
+     * @param Crawler $menu
+     *
+     * @return string[]
+     *
+     * @example [
+     *   'Управленческий совет' => [
+     *     'Информация о заседаниях',
+     *     'Представители учредителя',
+     *   ],
+     *   'Справки директоров',
+     * ]
+     */
+    private function retrieveMenuLabels(Crawler $menu): array
+    {
+        $menuLabels = [];
+
+        $menu->filterXPath('ul/li')->each(
+            function (Crawler $item) use (&$menuLabels) {
+                $itemLabel = trim($item->filterXPath('li/a')->text());
+                $subMenu = $item->filterXPath('li/ul');
+
+                if ($subMenu->count() === 0) {
+                    $menuLabels[] = $itemLabel;
+                } else {
+                    $menuLabels[$itemLabel] = $this->retrieveMenuLabels(
+                        $subMenu
+                    );
+                }
+            }
+        );
+
+        return $menuLabels;
     }
 }
