@@ -938,4 +938,60 @@ HTML;
         );
         $this->assertFormFieldContainsError($label, $error, $crawler);
     }
+
+    public function dataProvider_TestAssertFileFormFieldExists()
+    {
+        $html = <<<'HTML'
+        <form>
+            <div class="form-group">
+                <label class="control-label" for="sbe667f4009_file">
+                    Справочное изображение
+                </label>
+                <div class="sonata-ba-field sonata-ba-field-standard-natural">
+                    <input type="file" id="sbe667f4009_file" name="sbe667f4009[file]">
+                    <span class="help-block sonata-ba-field-help">
+                        <img src="/uploads/image.jpg" class="admin-preview">
+                    </span>
+                </div>
+            </div>
+        </form>
+HTML;
+
+        return [[$html]];
+    }
+
+    /**
+     * @dataProvider dataProvider_TestAssertFileFormFieldExists
+     *
+     * @param string $html
+     */
+    public function testAssertFileFormFieldExists_Success(string $html)
+    {
+        $crawler = new Crawler();
+        $crawler->addHtmlContent($html);
+
+        $label = 'Справочное изображение';
+
+        $this->assertFileFormFieldExists($label, $crawler);
+    }
+
+    /**
+     * @dataProvider dataProvider_TestAssertFileFormFieldExists
+     *
+     * @param string $html
+     */
+    public function testAssertFileFormFieldExists_ShouldThrowException(
+        string $html
+    ) {
+        $crawler = new Crawler();
+        $crawler->addHtmlContent($html);
+
+        $label = 'Несуществующее поле';
+
+        $this->expectException(ExpectationFailedException::class);
+        $this->expectExceptionMessage(
+            'Не найдено файловое поле с заголовком "Несуществующее поле"'
+        );
+        $this->assertFileFormFieldExists($label, $crawler);
+    }
 }

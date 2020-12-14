@@ -245,8 +245,6 @@ trait SonataAdminFormTrait
     }
 
     /**
-     * TODO: Нет тестов
-     *
      * Проверяет, что файловое поле с данным заголовком существует в форме.
      *
      * @param string  $label наименование поля
@@ -255,7 +253,7 @@ trait SonataAdminFormTrait
     protected function assertFileFormFieldExists(string $label, Crawler $form)
     {
         $message = sprintf(
-            'Не найдено поле с заголовком "%s"',
+            'Не найдено файловое поле с заголовком "%s"',
             $label
         );
 
