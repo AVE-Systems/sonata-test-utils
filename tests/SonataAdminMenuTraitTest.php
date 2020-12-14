@@ -214,6 +214,47 @@ HTML;
      *
      * @param string $html
      */
+    public function testAssertMenuItemInGroupExists_ShouldThrowException(
+        string $html
+    ) {
+        $this->expectException(ExpectationFailedException::class);
+        $this->expectExceptionMessageMatches(
+            '.В группе меню "Управляющий совет" нет пункта "Адрес поддержки".'
+        );
+
+        $crawler = new Crawler();
+        $crawler->addHtmlContent($html);
+
+        $this->assertMenuItemInGroupExists(
+            $crawler,
+            'Адрес поддержки',
+            'Управляющий совет'
+        );
+    }
+
+    /**
+     * @dataProvider dataProvider_TestAssertMenuItem
+     *
+     * @param string $html
+     */
+    public function testAssertMenuItemInGroupExists_ShouldNotThrowException(
+        string $html
+    ) {
+        $crawler = new Crawler();
+        $crawler->addHtmlContent($html);
+
+        $this->assertMenuItemInGroupExists(
+            $crawler,
+            'Информация о заседаниях',
+            'Управляющий совет'
+        );
+    }
+
+    /**
+     * @dataProvider dataProvider_TestAssertMenuItem
+     *
+     * @param string $html
+     */
     public function testAssertMenuItemInGroupNotExists_ShouldThrowException(
         string $html
     ) {
