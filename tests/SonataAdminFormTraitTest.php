@@ -2,10 +2,10 @@
 
 namespace Tests;
 
+use AveSystems\SonataTestUtils\SonataAdminFormTrait;
 use PHPUnit\Framework\ExpectationFailedException;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\DomCrawler\Crawler;
-use AveSystems\SonataTestUtils\SonataAdminFormTrait;
 
 class SonataAdminFormTraitTest extends TestCase
 {

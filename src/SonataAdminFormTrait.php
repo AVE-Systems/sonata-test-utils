@@ -123,7 +123,7 @@ trait SonataAdminFormTrait
      * @param string  $label
      * @param Crawler $form
      */
-    private function assertFormTextFieldExists(string $label, Crawler $form)
+    protected function assertFormTextFieldExists(string $label, Crawler $form)
     {
         $message = sprintf(
             'Не найдено поле с заголовком "%s"',
@@ -146,7 +146,7 @@ trait SonataAdminFormTrait
      * @param string  $label
      * @param Crawler $form
      */
-    private function assertFormNumberFieldExists(string $label, Crawler $form)
+    protected function assertFormNumberFieldExists(string $label, Crawler $form)
     {
         $message = sprintf(
             'Не найдено поле с заголовком "%s"',
@@ -169,7 +169,7 @@ trait SonataAdminFormTrait
      * @param string  $label
      * @param Crawler $form
      */
-    private function assertFormTextareaFieldExists(string $label, Crawler $form)
+    protected function assertFormTextareaFieldExists(string $label, Crawler $form)
     {
         $message = sprintf(
             'Не найдено поле с заголовком "%s"',
@@ -191,7 +191,7 @@ trait SonataAdminFormTrait
      * @param string  $label
      * @param Crawler $form
      */
-    private function assertFormCheckboxFieldExists(string $label, Crawler $form)
+    protected function assertFormCheckboxFieldExists(string $label, Crawler $form)
     {
         $message = sprintf(
             'Не найдено поле с заголовком "%s"',
@@ -214,7 +214,7 @@ trait SonataAdminFormTrait
      * @param string  $label
      * @param Crawler $form
      */
-    private function assertFormCheckboxFieldExistsAndChecked(
+    protected function assertFormCheckboxFieldExistsAndChecked(
         string $label,
         Crawler $form
     ) {
@@ -245,38 +245,8 @@ trait SonataAdminFormTrait
     }
 
     /**
-     * Возвращает XPath-путь к флажковому полю формы с заданным заголовком.
+     * TODO: Нет тестов
      *
-     * @param string $label
-     *
-     * @return string
-     */
-    private function getFormCheckboxFieldXPath(string $label): string
-    {
-        $fieldXPath = "form//div[contains(@class, 'sonata-ba-field')]";
-        $labelXPath = "label/span[contains(@class, 'control-label__text') and normalize-space()='$label']";
-        $checkboxXPath = "input[@type='checkbox']";
-
-        return "$fieldXPath//{$labelXPath}/preceding-sibling::{$checkboxXPath}";
-    }
-
-    /**
-     * Возвращает путь для получения файлового поля по его названию.
-     *
-     * @param string $label название (лейбл)
-     *
-     * @return string
-     */
-    protected function getFileFieldXPath(string $label)
-    {
-        $labelXPath = $this->getFormFieldLabelXPath($label);
-        $fileFieldContainerXPath = "div[contains(@class, 'sonata-ba-field')]";
-        $fileFieldXPath = "input[@type='file']";
-
-        return "$labelXPath/following-sibling::{$fileFieldContainerXPath}//{$fileFieldXPath}";
-    }
-
-    /**
      * Проверяет, что файловое поле с данным заголовком существует в форме.
      *
      * @param string  $label наименование поля
@@ -377,39 +347,6 @@ trait SonataAdminFormTrait
     }
 
     /**
-     * Возвращает XPath-путь к опции в списковом поле с заданными заголовками
-     * поля и значения.
-     *
-     * @param string $selectLabel
-     * @param string $optionTitle
-     *
-     * @return string
-     */
-    private function getSelectOptionXPath(
-        string $selectLabel,
-        string $optionTitle
-    ): string {
-        return "//{$this->getSelectFieldXPath($selectLabel)}".
-            "/option[text() = '$optionTitle']";
-    }
-
-    /**
-     * Возвращает XPath-путь к списковому полю формы с заданным заголовком.
-     *
-     * @param string $label
-     *
-     * @return string
-     */
-    private function getSelectFieldXPath(string $label): string
-    {
-        $labelXPath = $this->getFormFieldLabelXPath($label);
-        $inputContainerXPath = "div[contains(@class, 'sonata-ba-field')]";
-        $inputXPath = "select[contains(@class, 'form-control')]";
-
-        return "$labelXPath/following-sibling::{$inputContainerXPath}//{$inputXPath}";
-    }
-
-    /**
      * Проверяет, что поле множественного выбора с автокомплитом с данным
      * заголовком существует в форме.
      *
@@ -481,6 +418,143 @@ trait SonataAdminFormTrait
             empty($notFound) && empty($extraFound),
             $message
         );
+    }
+
+    /**
+     * Проверяет, что на странице создания/редактирования
+     * отсутствует кнопка, соответствующая переданному действию.
+     *
+     * @param string  $actionTitle
+     * @param Crawler $crawler
+     */
+    protected function assertFormActionButtonNotExists(
+        string $actionTitle,
+        Crawler $crawler
+    ): void {
+        $actionButtonXPath = $this->getFormActionButtonXPath($actionTitle);
+
+        $this->assertCount(
+            0,
+            $crawler->filterXPath($actionButtonXPath),
+            "На форме есть кнопка '$actionTitle'"
+        );
+    }
+
+    /**
+     * Проверяет, что на странице создания/редактирования
+     * присутствует кнопка, соответствующая переданному действию.
+     *
+     * @param string  $actionTitle
+     * @param Crawler $crawler
+     */
+    protected function assertFormActionButtonExists(
+        string $actionTitle,
+        Crawler $crawler
+    ): void {
+        $actionButtonXPath = $this->getFormActionButtonXPath($actionTitle);
+
+        $this->assertCount(
+            1,
+            $crawler->filterXPath($actionButtonXPath),
+            "На форме нет кнопки '$actionTitle'"
+        );
+    }
+
+    /**
+     * Проверяет есть ли заданая ошибка для элемента формы с определенным лэйблом.
+     *
+     * @param string  $label   лэйбл для поиска элемента формы
+     * @param string  $error   ожидаемая строка ошибки
+     * @param Crawler $crawler
+     */
+    protected function assertFormFieldContainsError(
+        string $label,
+        string $error,
+        Crawler $crawler
+    ) {
+        $labelXPath = $this->getFormFieldLabelXPath($label);
+        $containerXPath = "div[contains(@class, 'sonata-ba-field')]";
+        $errorListXPath = "div[contains(@class, 'sonata-ba-field-error-messages')]";
+
+        $errorsPath = "//$labelXPath/following-sibling::{$containerXPath}//{$errorListXPath}";
+        $errorsContainer = $crawler->filterXPath($errorsPath);
+
+        $this->assertCount(
+            1,
+            $errorsContainer,
+            'Не удалось однозначно найти такое поле с ошибками'
+        );
+
+        $this->assertStringContainsString(
+            $error,
+            $errorsContainer->text(),
+            'Ошибка не равна ожидаемой'
+        );
+    }
+
+    /**
+     * Возвращает XPath-путь к флажковому полю формы с заданным заголовком.
+     *
+     * @param string $label
+     *
+     * @return string
+     */
+    private function getFormCheckboxFieldXPath(string $label): string
+    {
+        $fieldXPath = "form//div[contains(@class, 'sonata-ba-field')]";
+        $labelXPath = "label/span[contains(@class, 'control-label__text') and normalize-space()='$label']";
+        $checkboxXPath = "input[@type='checkbox']";
+
+        return "$fieldXPath//{$labelXPath}/preceding-sibling::{$checkboxXPath}";
+    }
+
+    /**
+     * Возвращает путь для получения файлового поля по его названию.
+     *
+     * @param string $label название (лейбл)
+     *
+     * @return string
+     */
+    private function getFileFieldXPath(string $label)
+    {
+        $labelXPath = $this->getFormFieldLabelXPath($label);
+        $fileFieldContainerXPath = "div[contains(@class, 'sonata-ba-field')]";
+        $fileFieldXPath = "input[@type='file']";
+
+        return "$labelXPath/following-sibling::{$fileFieldContainerXPath}//{$fileFieldXPath}";
+    }
+
+    /**
+     * Возвращает XPath-путь к опции в списковом поле с заданными заголовками
+     * поля и значения.
+     *
+     * @param string $selectLabel
+     * @param string $optionTitle
+     *
+     * @return string
+     */
+    private function getSelectOptionXPath(
+        string $selectLabel,
+        string $optionTitle
+    ): string {
+        return "//{$this->getSelectFieldXPath($selectLabel)}".
+            "/option[text() = '$optionTitle']";
+    }
+
+    /**
+     * Возвращает XPath-путь к списковому полю формы с заданным заголовком.
+     *
+     * @param string $label
+     *
+     * @return string
+     */
+    private function getSelectFieldXPath(string $label): string
+    {
+        $labelXPath = $this->getFormFieldLabelXPath($label);
+        $inputContainerXPath = "div[contains(@class, 'sonata-ba-field')]";
+        $inputXPath = "select[contains(@class, 'form-control')]";
+
+        return "$labelXPath/following-sibling::{$inputContainerXPath}//{$inputXPath}";
     }
 
     /**
@@ -567,46 +641,6 @@ trait SonataAdminFormTrait
     }
 
     /**
-     * Проверяет, что на странице создания/редактирования
-     * отсутствует кнопка, соответствующая переданному действию.
-     *
-     * @param string  $actionTitle
-     * @param Crawler $crawler
-     */
-    protected function assertFormActionButtonNotExists(
-        string $actionTitle,
-        Crawler $crawler
-    ): void {
-        $actionButtonXPath = $this->getFormActionButtonXPath($actionTitle);
-
-        $this->assertCount(
-            0,
-            $crawler->filterXPath($actionButtonXPath),
-            "На форме есть кнопка '$actionTitle'"
-        );
-    }
-
-    /**
-     * Проверяет, что на странице создания/редактирования
-     * присутствует кнопка, соответствующая переданному действию.
-     *
-     * @param string  $actionTitle
-     * @param Crawler $crawler
-     */
-    protected function assertFormActionButtonExists(
-        string $actionTitle,
-        Crawler $crawler
-    ): void {
-        $actionButtonXPath = $this->getFormActionButtonXPath($actionTitle);
-
-        $this->assertCount(
-            1,
-            $crawler->filterXPath($actionButtonXPath),
-            "На форме нет кнопки '$actionTitle'"
-        );
-    }
-
-    /**
      * Возвращает XPath-путь к кнопке действий над формой с заданным текстом.
      *
      * @param string $buttonText
@@ -685,7 +719,7 @@ trait SonataAdminFormTrait
      *
      * @return Crawler
      */
-    protected function getSubAdminTableByItsTitle(string $title, Crawler $form): Crawler
+    private function getSubAdminTableByItsTitle(string $title, Crawler $form): Crawler
     {
         $labelXPath = $this->getFormFieldLabelXPath($title);
         $tableXPath = "//$labelXPath/following-sibling::div//table[contains(@class,'table')]";
@@ -705,38 +739,6 @@ trait SonataAdminFormTrait
         $selectedOption = $selectElement->filter('option[selected]');
 
         return trim($selectedOption->attr('value'));
-    }
-
-    /**
-     * Проверяет есть ли заданая ошибка для элемента формы с определенным лэйблом.
-     *
-     * @param string  $label   лэйбл для поиска элемента формы
-     * @param string  $error   ожидаемая строка ошибки
-     * @param Crawler $crawler
-     */
-    protected function assertFormFieldContainsError(
-        string $label,
-        string $error,
-        Crawler $crawler
-    ) {
-        $labelXPath = $this->getFormFieldLabelXPath($label);
-        $containerXPath = "div[contains(@class, 'sonata-ba-field')]";
-        $errorListXPath = "div[contains(@class, 'sonata-ba-field-error-messages')]";
-
-        $errorsPath = "//$labelXPath/following-sibling::{$containerXPath}//{$errorListXPath}";
-        $errorsContainer = $crawler->filterXPath($errorsPath);
-
-        $this->assertCount(
-            1,
-            $errorsContainer,
-            'Не удалось однозначно найти такое поле с ошибками'
-        );
-
-        $this->assertStringContainsString(
-            $error,
-            $errorsContainer->text(),
-            'Ошибка не равна ожидаемой'
-        );
     }
 
     /**
