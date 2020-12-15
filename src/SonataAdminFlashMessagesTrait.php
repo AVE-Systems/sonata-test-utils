@@ -23,7 +23,7 @@ trait SonataAdminFlashMessagesTrait
      * @param string  $message
      * @param Crawler $crawler
      */
-    private function assertFlashSuccessMessageExists(
+    protected function assertFlashSuccessMessageExists(
         string $message,
         Crawler $crawler
     ): void {
@@ -53,7 +53,7 @@ trait SonataAdminFlashMessagesTrait
      * @param string  $error
      * @param Crawler $crawler
      */
-    private function assertFlashErrorMessageExists(
+    protected function assertFlashErrorMessageExists(
         string $error,
         Crawler $crawler
     ): void {
@@ -83,11 +83,42 @@ trait SonataAdminFlashMessagesTrait
      * @param int     $count
      * @param Crawler $crawler
      */
-    private function assertFlashErrorMessagesCount(int $count, Crawler $crawler)
+    protected function assertFlashErrorMessagesCount(int $count, Crawler $crawler)
     {
         $this->assertEquals(
             $count,
             $this->findFlashErrorMessages($crawler)->count()
+        );
+    }
+
+    /**
+     * Позволяет проверить текст "предупреждающего" флэш-сообшения в респонсе.
+     *
+     * @param string  $expectedMessage
+     * @param Crawler $crawler
+     */
+    protected function assertFlashWarningMessageExists(
+        string $expectedMessage,
+        Crawler $crawler
+    ): void {
+        $nodes = $this->findFlashWarningMessages($crawler)->getIterator();
+
+        $this->assertGreaterThan(
+            0,
+            $nodes->count(),
+            'Сообщения c предупреждениями отсутствуют на странице!'
+        );
+
+        $matched = false;
+        foreach ($nodes as $node) {
+            if (preg_match("~{$expectedMessage}~", $node->nodeValue)) {
+                $matched = true;
+            }
+        }
+        $this->assertTrue(
+            $matched,
+            'Предупреждающие флэш-сообщения не содержат текст "'
+            .$expectedMessage.'".'
         );
     }
 
@@ -115,37 +146,6 @@ trait SonataAdminFlashMessagesTrait
     {
         return $crawler
             ->filter('div[class="alert alert-success fade in"]');
-    }
-
-    /**
-     * Позволяет проверить текст "предупреждающего" флэш-сообшения в респонсе.
-     *
-     * @param string  $expectedMessage
-     * @param Crawler $crawler
-     */
-    private function assertFlashWarningMessageExists(
-        string $expectedMessage,
-        Crawler $crawler
-    ): void {
-        $nodes = $this->findFlashWarningMessages($crawler)->getIterator();
-
-        $this->assertGreaterThan(
-            0,
-            $nodes->count(),
-            'Сообщения c предупреждениями отсутствуют на странице!'
-        );
-
-        $matched = false;
-        foreach ($nodes as $node) {
-            if (preg_match("~{$expectedMessage}~", $node->nodeValue)) {
-                $matched = true;
-            }
-        }
-        $this->assertTrue(
-            $matched,
-            'Предупреждающие флэш-сообщения не содержат текст "'
-            .$expectedMessage.'".'
-        );
     }
 
     /**

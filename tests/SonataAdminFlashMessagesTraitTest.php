@@ -2,10 +2,10 @@
 
 namespace Tests;
 
+use AveSystems\SonataTestUtils\SonataAdminFlashMessagesTrait;
 use PHPUnit\Framework\ExpectationFailedException;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\DomCrawler\Crawler;
-use AveSystems\SonataTestUtils\SonataAdminFlashMessagesTrait;
 
 final class SonataAdminFlashMessagesTraitTest extends TestCase
 {

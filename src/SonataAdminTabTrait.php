@@ -53,7 +53,7 @@ trait SonataAdminTabTrait
      *                               вкладок (ul-список) и контейнер с панелями
      *                               вкладок
      */
-    private function assertTabLabelExists(string $tabLabel, Crawler $tabsContainer)
+    protected function assertTabLabelExists(string $tabLabel, Crawler $tabsContainer)
     {
         $this->assertCount(
             1,
@@ -71,7 +71,7 @@ trait SonataAdminTabTrait
      *                               вкладок (ul-список) и контейнер с панелями
      *                               вкладок
      */
-    private function assertTabLabelNotExists(string $tabLabel, Crawler $tabsContainer)
+    protected function assertTabLabelNotExists(string $tabLabel, Crawler $tabsContainer)
     {
         $this->assertCount(
             0,
@@ -90,7 +90,7 @@ trait SonataAdminTabTrait
      *                               вкладок (ul-список) и контейнер с панелями
      *                               вкладок
      */
-    private function assertTabPaneExists(string $tabLabel, Crawler $tabsContainer)
+    protected function assertTabPaneExists(string $tabLabel, Crawler $tabsContainer)
     {
         $tabPaneXPath = $this->getTabPaneXPathByTabLabel($tabLabel, $tabsContainer);
 
