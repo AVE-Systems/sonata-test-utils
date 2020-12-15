@@ -25,7 +25,11 @@
   ],
   "minimum-stability": "stable",
   "keywords": [
-    "trait", "php7", "helper", "sonata-admin", "testing"
+    "trait",
+    "php7",
+    "helper",
+    "sonata-admin",
+    "testing"
   ],
   "require": {
     "php": "^7.2",
