@@ -2,7 +2,8 @@
   "name": "ave-systems/sonata-test-utils",
   "description": "Utils for testing SonataAdminBundle",
   "homepage": "https://github.com/AVE-Systems/sonata-test-utils",
-  "version": "0.1.0",
+  "license": "Apache-2.0",
+  "version": "0.1.1",
   "type": "library",
   "authors": [
     {
@@ -24,10 +25,14 @@
   ],
   "minimum-stability": "stable",
   "keywords": [
-    "trait", "php7", "helper", "sonata-admin", "testing"
+    "trait",
+    "php7",
+    "helper",
+    "sonata-admin",
+    "testing"
   ],
   "require": {
-    "php": "^7.2",
+    "php": ">=7.2",
     "ext-json": "*",
     "symfony/dom-crawler": "*",
     "symfony/css-selector": "*",
