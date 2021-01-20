@@ -14,7 +14,7 @@ RUN apt-get autoremove -y && rm -rf /var/lib/apt/lists/*
 RUN docker-php-ext-configure zip --with-libzip && \
   docker-php-ext-install zip
 
-COPY --from=composer:2.0 /usr/bin/composer /usr/bin/composer
+COPY --from=composer:1.10 /usr/bin/composer /usr/bin/composer
 RUN composer --version
 
 RUN pecl install xdebug-2.6.1 && docker-php-ext-enable xdebug
