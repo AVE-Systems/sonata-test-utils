@@ -279,7 +279,7 @@ trait SonataAdminFormTrait
         Crawler $form
     ) {
         $message = sprintf(
-            'Не найдено поле с заголовком "%s" и значением "%s"',
+            'The field with title "%s" and value "%s" is not found',
             $label,
             $expectedValue
         );

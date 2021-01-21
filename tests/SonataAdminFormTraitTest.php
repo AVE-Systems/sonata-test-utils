@@ -542,7 +542,7 @@ HTML;
     {
         $this->expectException(ExpectationFailedException::class);
         $this->expectExceptionMessage(
-            'Не найдено поле с заголовком "List" и значением "2"'
+            'The field with title "List" and value "2" is not found'
         );
 
         $crawler = new Crawler();
