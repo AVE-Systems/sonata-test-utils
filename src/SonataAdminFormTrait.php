@@ -279,7 +279,7 @@ trait SonataAdminFormTrait
         Crawler $form
     ) {
         $message = sprintf(
-            'The field with title "%s" and value "%s" is not found',
+            'The field with title "%s" and value "%s" not found',
             $label,
             $expectedValue
         );
@@ -335,7 +335,7 @@ trait SonataAdminFormTrait
         Crawler $form
     ) {
         $message = sprintf(
-            'The value "%s" is not found in the field with title "%s"',
+            'The value "%s" in the field with title "%s" not found',
             $optionTitle,
             $selectLabel
         );

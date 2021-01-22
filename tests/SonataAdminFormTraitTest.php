@@ -483,8 +483,8 @@ HTML;
     {
         $this->expectException(ExpectationFailedException::class);
         $this->expectExceptionMessage(
-            'The value "Not existed option" is not found in the field with '.
-            'title "List"'
+            'The value "Not existed option" in the field with '.
+            'title "List" not found'
         );
 
         $crawler = new Crawler();
@@ -542,7 +542,7 @@ HTML;
     {
         $this->expectException(ExpectationFailedException::class);
         $this->expectExceptionMessage(
-            'The field with title "List" and value "2" is not found'
+            'The field with title "List" and value "2" not found'
         );
 
         $crawler = new Crawler();
