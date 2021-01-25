@@ -289,14 +289,16 @@ trait SonataAdminFormTrait
 
         if ($expectedValue === '') {
             $this->assertCount(
-                0,
+                1,
                 $this->getSelectedValuesFromSelect($selectElement)
             );
+
+            $value = $this->getSelectedValuesFromSelect($selectElement)[0];
         } else {
             $value = $this->getSelectedValueFromSelect($selectElement);
-
-            $this->assertEquals($expectedValue, $value, $message);
         }
+
+        $this->assertEquals($expectedValue, $value, $message);
     }
 
     /**

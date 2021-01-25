@@ -402,7 +402,7 @@ HTML;
                                 class="form-control" 
                                 title="List"
                         >
-                            <option value=""></option>
+                            <option value="" selected="selected"></option>
                             <option value="2">Not selected option 2</option>
                             <option value="1">Not selected option 1</option>
                         </select>
