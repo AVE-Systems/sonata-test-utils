@@ -239,7 +239,7 @@ trait SonataAdminFormTrait
         );
 
         $this->assertTrue(
-            !!$element->attr('checked'),
+            (bool) $element->attr('checked'),
             $checkedMessage
         );
     }
@@ -279,16 +279,24 @@ trait SonataAdminFormTrait
         Crawler $form
     ) {
         $message = sprintf(
-            'Не найдено поле с заголовком "%s" и значением "%s"',
+            'The field with title "%s" and value "%s" not found',
             $label,
             $expectedValue
         );
 
         $selectXPath = "//{$this->getSelectFieldXPath($label)}";
         $selectElement = $form->filterXPath($selectXPath)->first();
-        $value = $this->getSelectedValueFromSelect($selectElement);
 
-        $this->assertEquals($expectedValue, $value, $message);
+        if ($expectedValue === '') {
+            $this->assertCount(
+                0,
+                $this->getSelectedValuesFromSelect($selectElement)
+            );
+        } else {
+            $value = $this->getSelectedValueFromSelect($selectElement);
+
+            $this->assertEquals($expectedValue, $value, $message);
+        }
     }
 
     /**
@@ -327,7 +335,7 @@ trait SonataAdminFormTrait
         Crawler $form
     ) {
         $message = sprintf(
-            'Не найдено значение "%s" в поле с заголовком "%s"',
+            'The value "%s" in the field with title "%s" not found',
             $optionTitle,
             $selectLabel
         );
@@ -373,9 +381,9 @@ trait SonataAdminFormTrait
      * Проверяет, что поле множественного выбора с автокомплитом имеет
      * ожидаемые значения и не имеет лишних значений.
      *
-     * @param string[]  $expectedValues ожидаемые значения
-     * @param string    $label          наименование поля
-     * @param Crawler   $form           ссылка на краулер по форме
+     * @param string[] $expectedValues ожидаемые значения
+     * @param string   $label          наименование поля
+     * @param Crawler  $form           ссылка на краулер по форме
      */
     protected function assertMultipleSelectFormFieldWithAutocompleteValueEquals(
         array $expectedValues,
@@ -568,7 +576,7 @@ trait SonataAdminFormTrait
     ): string {
         $labelXPath = $this->getFormFieldLabelXPath($label);
         $inputContainerXPath = "div[contains(@class, 'sonata-ba-field')]";
-        $inputXPath = "select";
+        $inputXPath = 'select';
 
         // Ищем такой путь, потому что соната не помечает явным образом
         // select с автокомплитом.
@@ -751,7 +759,7 @@ trait SonataAdminFormTrait
         $result = [];
 
         /**
-         * @var DOMElement $selectedOption
+         * @var DOMElement
          */
         foreach ($selectElement->children('option[selected]') as $selectedOption) {
             $result[] = trim($selectedOption->getAttribute('value'));
@@ -772,8 +780,8 @@ trait SonataAdminFormTrait
         return implode(
             ', ',
             array_map(
-                function($value) {
-                    return '"' . $value . '"';
+                function ($value) {
+                    return '"'.$value.'"';
                 },
                 $data
             )

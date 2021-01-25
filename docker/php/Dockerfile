@@ -1,12 +1,21 @@
 FROM php:7.2-cli
 
-RUN apt-get update
+RUN apt-get update -y
 
-RUN DEBIAN_FRONTEND=noninteractive apt-get install -y git
+RUN DEBIAN_FRONTEND=noninteractive apt-get install -yq --no-install-recommends \
+  apt-utils \
+  git \
+  libzip-dev \
+  unzip
 
-RUN php -r "copy('https://getcomposer.org/installer', 'composer-setup.php');" \
-    && php composer-setup.php --install-dir=/usr/bin --filename=composer \
-    && php -r "unlink('composer-setup.php');"
+RUN apt-get autoremove -y && rm -rf /var/lib/apt/lists/*
+
+# Install PHP Extensions
+RUN docker-php-ext-configure zip --with-libzip && \
+  docker-php-ext-install zip
+
+COPY --from=composer:1.10 /usr/bin/composer /usr/bin/composer
+RUN composer --version
 
 RUN pecl install xdebug-2.6.1 && docker-php-ext-enable xdebug
 
