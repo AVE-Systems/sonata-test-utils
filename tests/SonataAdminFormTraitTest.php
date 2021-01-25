@@ -11,7 +11,7 @@ class SonataAdminFormTraitTest extends TestCase
 {
     use SonataAdminFormTrait;
 
-    public function dataProvider_TestAssertFormFieldValueEquals()
+    public function dataProvider_TestAssertFormFieldValueEquals(): array
     {
         $html = <<<'HTML'
           <form>
@@ -241,7 +241,7 @@ HTML;
         );
     }
 
-    public function dataProvider_TestAssertFormActionButtonExistsAndNotExists()
+    public function dataProvider_TestAssertFormActionButtonExistsAndNotExists(): array
     {
         $html = <<<'HTML'
           <form>
@@ -362,21 +362,49 @@ HTML;
         );
     }
 
-    public function dataProvider_SelectForm()
+    public function dataProvider_SelectForm(): array
+    {
+        $html = <<<'HTML'
+         <form>
+            <div class="form-group" id="sonata-ba-field-container-sbb9cecc71b_list">
+                <label class="control-label" for="sbb9cecc71b_list">
+                    List
+                </label>
+                <div class="sonata-ba-field sonata-ba-field-standard-natural">        
+                    <select id="sbb9cecc71b_list" 
+                            name="sbb9cecc71b[list]" 
+                            class="form-control" 
+                            title="List"
+                    >
+                        <option value=""></option>
+                        <option value="2">Not selected option</option>
+                        <option value="1" selected="selected">Selected option</option>
+                    </select>
+                </div>
+            </div>
+        </form>
+HTML;
+
+        return [[$html]];
+    }
+
+    public function dataProvider_SelectForm_NoSelected(): array
     {
         $html = <<<'HTML'
             <form>
                 <div class="form-group">
-                    <label class="control-label required">
-                      Список
+                    <label class="control-label" for="sbb9cecc71b_list">
+                        List
                     </label>
                     <div class="sonata-ba-field sonata-ba-field-standard-natural">
-                        <select
-                            class="form-control"
-                            name="sbb9cecc71b[list]"
+                        <select id="sbb9cecc71b_list" 
+                                name="sbb9cecc71b[list]" 
+                                class="form-control" 
+                                title="List"
                         >
-                            <option value="0">Нет значения</option>
-                            <option value="1" selected>Значение</option>
+                            <option value=""></option>
+                            <option value="2">Not selected option 2</option>
+                            <option value="1">Not selected option 1</option>
                         </select>
                     </div>
                 </div>
@@ -397,7 +425,7 @@ HTML;
         $crawler->addHtmlContent($html);
 
         $this->assertSelectFormFieldExists(
-            'Список',
+            'List',
             $crawler
         );
     }
@@ -434,14 +462,14 @@ HTML;
         $crawler->addHtmlContent($html);
 
         $this->assertSelectOptionExists(
-            'Список',
-            'Нет значения',
+            'List',
+            'Not selected option',
             $crawler
         );
 
         $this->assertSelectOptionExists(
-            'Список',
-            'Значение',
+            'List',
+            'Selected option',
             $crawler
         );
     }
@@ -455,16 +483,16 @@ HTML;
     {
         $this->expectException(ExpectationFailedException::class);
         $this->expectExceptionMessage(
-            'Не найдено значение "Не существующий выбор" в поле с заголовком '.
-            '"Список"'
+            'The value "Not existed option" in the field with '.
+            'title "List" not found'
         );
 
         $crawler = new Crawler();
         $crawler->addHtmlContent($html);
 
         $this->assertSelectOptionExists(
-            'Список',
-            'Не существующий выбор',
+            'List',
+            'Not existed option',
             $crawler
         );
     }
@@ -482,7 +510,25 @@ HTML;
 
         $this->assertSelectFormFieldValueEquals(
             $expectedValueThatSelected,
-            'Список',
+            'List',
+            $crawler
+        );
+    }
+
+    /**
+     * @dataProvider dataProvider_SelectForm_NoSelected
+     *
+     * @param string $html
+     */
+    public function testAssertSelectFormFieldValueEquals_EmptyValue(string $html)
+    {
+        $crawler = new Crawler();
+        $crawler->addHtmlContent($html);
+        $expectedValueThatSelected = '';
+
+        $this->assertSelectFormFieldValueEquals(
+            $expectedValueThatSelected,
+            'List',
             $crawler
         );
     }
@@ -496,16 +542,16 @@ HTML;
     {
         $this->expectException(ExpectationFailedException::class);
         $this->expectExceptionMessage(
-            'Не найдено поле с заголовком "Список" и значением "0"'
+            'The field with title "List" and value "2" not found'
         );
 
         $crawler = new Crawler();
         $crawler->addHtmlContent($html);
-        $expectedValueThatNotSelected = '0';
+        $expectedValueThatNotSelected = '2';
 
         $this->assertSelectFormFieldValueEquals(
             $expectedValueThatNotSelected,
-            'Список',
+            'List',
             $crawler
         );
     }
