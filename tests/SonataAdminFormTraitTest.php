@@ -411,7 +411,31 @@ HTML;
             </form>
 HTML;
 
-        return [[$html]];
+        $htmlWithoutSelected = <<<'HTML'
+             <form>
+                <div class="form-group">
+                    <label class="control-label" for="sbb9cecc71b_list">
+                        List
+                    </label>
+                    <div class="sonata-ba-field sonata-ba-field-standard-natural">
+                        <select id="sbb9cecc71b_list" 
+                                name="sbb9cecc71b[list]" 
+                                class="form-control" 
+                                title="List"
+                        >
+                            <option value=""></option>
+                            <option value="2">Not selected option 2</option>
+                            <option value="1">Not selected option 1</option>
+                        </select>
+                    </div>
+                </div>
+            </form>
+HTML;
+
+        return [
+            'With "selected" attribute' => [$html],
+            'Without "selected" attribute' => [$htmlWithoutSelected]
+        ];
     }
 
     /**

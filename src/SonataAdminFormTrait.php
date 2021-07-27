@@ -288,17 +288,20 @@ trait SonataAdminFormTrait
         $selectElement = $form->filterXPath($selectXPath)->first();
 
         if ($expectedValue === '') {
-            $this->assertCount(
-                1,
-                $this->getSelectedValuesFromSelect($selectElement)
-            );
-
-            $value = $this->getSelectedValuesFromSelect($selectElement)[0];
+            $selectedValues = $this->getSelectedValuesFromSelect($selectElement);
+            if (count($selectedValues) === 1) {
+                $value = $this->getSelectedValuesFromSelect($selectElement)[0];
+                $this->assertEquals($expectedValue, $value, $message);
+            } else {
+                $this->assertCount(
+                    0,
+                    $this->getSelectedValuesFromSelect($selectElement)
+                );
+            }
         } else {
             $value = $this->getSelectedValueFromSelect($selectElement);
+            $this->assertEquals($expectedValue, $value, $message);
         }
-
-        $this->assertEquals($expectedValue, $value, $message);
     }
 
     /**
@@ -484,7 +487,7 @@ trait SonataAdminFormTrait
         $containerXPath = "div[contains(@class, 'sonata-ba-field')]";
         $errorListXPath = "div[contains(@class, 'sonata-ba-field-error-messages')]";
 
-        $errorsPath = "//$labelXPath/following-sibling::{$containerXPath}//{$errorListXPath}";
+        $errorsPath = "//$labelXPath/following-sibling::$containerXPath//$errorListXPath";
         $errorsContainer = $crawler->filterXPath($errorsPath);
 
         $this->assertCount(
@@ -513,7 +516,7 @@ trait SonataAdminFormTrait
         $labelXPath = "label/span[contains(@class, 'control-label__text') and normalize-space()='$label']";
         $checkboxXPath = "input[@type='checkbox']";
 
-        return "$fieldXPath//{$labelXPath}/preceding-sibling::{$checkboxXPath}";
+        return "$fieldXPath//$labelXPath/preceding-sibling::$checkboxXPath";
     }
 
     /**
@@ -523,13 +526,13 @@ trait SonataAdminFormTrait
      *
      * @return string
      */
-    private function getFileFieldXPath(string $label)
+    private function getFileFieldXPath(string $label): string
     {
         $labelXPath = $this->getFormFieldLabelXPath($label);
         $fileFieldContainerXPath = "div[contains(@class, 'sonata-ba-field')]";
         $fileFieldXPath = "input[@type='file']";
 
-        return "$labelXPath/following-sibling::{$fileFieldContainerXPath}//{$fileFieldXPath}";
+        return "$labelXPath/following-sibling::$fileFieldContainerXPath//$fileFieldXPath";
     }
 
     /**
@@ -562,7 +565,7 @@ trait SonataAdminFormTrait
         $inputContainerXPath = "div[contains(@class, 'sonata-ba-field')]";
         $inputXPath = "select[contains(@class, 'form-control')]";
 
-        return "$labelXPath/following-sibling::{$inputContainerXPath}//{$inputXPath}";
+        return "$labelXPath/following-sibling::$inputContainerXPath//$inputXPath";
     }
 
     /**
@@ -582,7 +585,7 @@ trait SonataAdminFormTrait
 
         // Ищем такой путь, потому что соната не помечает явным образом
         // select с автокомплитом.
-        return "$labelXPath/following-sibling::{$inputContainerXPath}//{$inputXPath}";
+        return "$labelXPath/following-sibling::$inputContainerXPath//$inputXPath";
     }
 
     /**
@@ -613,7 +616,7 @@ trait SonataAdminFormTrait
         $inputContainerXPath = "div[contains(@class, 'sonata-ba-field')]";
         $inputXPath = "input[@type='text' and contains(@class, 'form-control')]";
 
-        return "$labelXPath/following-sibling::{$inputContainerXPath}//{$inputXPath}";
+        return "$labelXPath/following-sibling::$inputContainerXPath//$inputXPath";
     }
 
     /**
@@ -629,7 +632,7 @@ trait SonataAdminFormTrait
         $inputContainerXPath = "div[contains(@class, 'sonata-ba-field')]";
         $inputXPath = "input[@type='number' and contains(@class, 'form-control')]";
 
-        return "$labelXPath/following-sibling::{$inputContainerXPath}//{$inputXPath}";
+        return "$labelXPath/following-sibling::$inputContainerXPath//$inputXPath";
     }
 
     /**
@@ -645,7 +648,7 @@ trait SonataAdminFormTrait
         $textareaContainerXPath = "div[contains(@class, 'sonata-ba-field')]";
         $textareaXPath = "textarea[contains(@class, 'form-control')]";
 
-        return "$labelXPath/following-sibling::$textareaContainerXPath//{$textareaXPath}";
+        return "$labelXPath/following-sibling::$textareaContainerXPath//$textareaXPath";
     }
 
     /**
@@ -676,7 +679,7 @@ trait SonataAdminFormTrait
     private function getNormalizedSpaceFormTextFieldValue(
         string $label,
         Crawler $form
-    ) {
+    ): string {
         $xPathToNormalize = "//{$this->getFormTextFieldXPath($label)}/@value";
 
         return $form->evaluate("normalize-space($xPathToNormalize)")[0];
@@ -694,7 +697,7 @@ trait SonataAdminFormTrait
     private function getNormalizedSpaceFormNumberFieldValue(
         string $label,
         Crawler $form
-    ) {
+    ): string {
         $xPathToNormalize = "//{$this->getFormNumberFieldXPath($label)}/@value";
 
         return $form->evaluate("normalize-space($xPathToNormalize)")[0];
@@ -712,7 +715,7 @@ trait SonataAdminFormTrait
     private function getNormalizedSpaceFormTextareaFieldValue(
         string $label,
         Crawler $form
-    ) {
+    ): string {
         $xPathToNormalize = "//{$this->getFormTextareaFieldXPath($label)}";
 
         return $form->evaluate("normalize-space($xPathToNormalize)")[0];
