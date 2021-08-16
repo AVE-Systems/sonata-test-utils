@@ -789,9 +789,6 @@ HTML;
      * @dataProvider dataProvider_CheckboxForm
      *
      * @param string $html
-     *
-     * @todo Разобраться почему здесь используется метод assertSelectFormFieldExists
-     * @todo https://trello.com/c/xyKQRV67
      */
     public function testAssertFormCheckboxFieldExists_NotExists(string $html)
     {
@@ -803,7 +800,7 @@ HTML;
         $crawler = new Crawler();
         $crawler->addHtmlContent($html);
 
-        $this->assertSelectFormFieldExists(
+        $this->assertFormCheckboxFieldExists(
             'Другое поле',
             $crawler
         );
