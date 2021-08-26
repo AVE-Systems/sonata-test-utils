@@ -28,6 +28,12 @@ class SonataAdminTabTraitTest extends TestCase
                 Тесты
             </a>
         </li>
+        <li>
+            <a href="#out" data-toggle="tab">
+                <i class="fa fa-exclamation-circle"></i>
+                Вкладка с содержимым вне контейнера
+            </a>
+        </li>
     </ul>
     <div class="tab-content">
         <div class="tab-pane fade" id="portfolio">
@@ -37,13 +43,20 @@ class SonataAdminTabTraitTest extends TestCase
             Данные тестов
         </div>
     </div>
+    <div class="tab-pane fade" id="out">
+        Содержимое вне контейнера
+    </div>
 </div>
 HTML;
 
         $crawler = new Crawler();
         $crawler->addHtmlContent($html);
 
-        $this->assertTabExists('Тесты', $crawler->filter('div.nav-tabs-custom'));
+        $tabsContainer = $crawler->filter('div.nav-tabs-custom');
+
+        $this->assertTabExists('Портфолио', $tabsContainer);
+        $this->assertTabExists('Тесты', $tabsContainer);
+        $this->assertTabExists('Вкладка с содержимым вне контейнера', $tabsContainer);
     }
 
     public function testAssertTabExists_ShouldThrowExceptionIfTabLabelNotFound()
