@@ -124,16 +124,6 @@ trait SonataAdminTabTrait
     }
 
     /**
-     * Возвращает XPath-путь к контейнеру с панелями вкладок.
-     *
-     * @return string
-     */
-    private function tabPanesContainerXPath(): string
-    {
-        return "{$this->tabLabelsContainerXPath()}/following-sibling::div[contains(@class, 'tab-content')]";
-    }
-
-    /**
      * Возвращает XPath-путь к панели вкладки с заданным идентификатором.
      *
      * @param string $tabPaneId идентификатор без предшествующего "#"
@@ -142,7 +132,8 @@ trait SonataAdminTabTrait
      */
     private function getTabPaneXPath(string $tabPaneId): string
     {
-        return "{$this->tabPanesContainerXPath()}/div[contains(@class, 'tab-pane') and @id='$tabPaneId']";
+        return "{$this->tabLabelsContainerXPath()}/following-sibling::div"
+            ."/descendant-or-self::div[contains(@class, 'tab-pane') and @id='$tabPaneId']";
     }
 
     /**
