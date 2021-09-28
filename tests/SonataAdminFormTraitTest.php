@@ -868,6 +868,67 @@ HTML;
         );
     }
 
+    /**
+     * @dataProvider dataProvider_CheckboxForm
+     *
+     * @param string $html
+     */
+    public function testAssertFormCheckboxFieldExistsAndUnchecked_Unchecked(
+        string $html
+    ) {
+        $crawler = new Crawler();
+        $crawler->addHtmlContent($html);
+
+        $this->assertFormCheckboxFieldExistsAndUnchecked(
+            'Тестовый флаг',
+            $crawler
+        );
+    }
+
+    /**
+     * @dataProvider dataProvider_CheckboxForm
+     *
+     * @param string $html
+     */
+    public function testAssertFormCheckboxFieldExistsAndUnchecked_ExistsButChecked(
+        string $html
+    ) {
+        $this->expectException(ExpectationFailedException::class);
+        $this->expectExceptionMessage(
+            'Поле с заголовком "Выбранный флаг" не в выключенном состоянии'
+        );
+
+        $crawler = new Crawler();
+        $crawler->addHtmlContent($html);
+
+        $this->assertFormCheckboxFieldExistsAndUnchecked(
+            'Выбранный флаг',
+            $crawler
+        );
+    }
+
+    /**
+     * @dataProvider dataProvider_CheckboxForm
+     *
+     * @param string $html
+     */
+    public function testAssertFormCheckboxFieldExistsAndUnchecked_NotExists(
+        string $html
+    ) {
+        $this->expectException(ExpectationFailedException::class);
+        $this->expectExceptionMessage(
+            'Не найдено поле с заголовком "Другое поле"'
+        );
+
+        $crawler = new Crawler();
+        $crawler->addHtmlContent($html);
+
+        $this->assertFormCheckboxFieldExistsAndUnchecked(
+            'Другое поле',
+            $crawler
+        );
+    }
+
     public function dataProvider_TableForm()
     {
         $html = <<<'HTML'
