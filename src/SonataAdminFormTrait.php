@@ -245,6 +245,43 @@ trait SonataAdminFormTrait
     }
 
     /**
+     * Проверяет, что заданное поле в виде checkbox существует на форме и
+     * находится в выключенном состоянии.
+     *
+     * @param string  $label
+     * @param Crawler $form
+     */
+    protected function assertFormCheckboxFieldExistsAndUnchecked(
+        string $label,
+        Crawler $form
+    ) {
+        $message = sprintf(
+            'Не найдено поле с заголовком "%s"',
+            $label
+        );
+
+        $inputXPath = "//{$this->getFormCheckboxFieldXPath($label)}";
+
+        $element = $form->filterXPath($inputXPath);
+
+        $this->assertCount(
+            1,
+            $element,
+            $message
+        );
+
+        $checkedMessage = sprintf(
+            'Поле с заголовком "%s" не в выключенном состоянии',
+            $label
+        );
+
+        $this->assertNull(
+            $element->attr('checked'),
+            $checkedMessage
+        );
+    }
+
+    /**
      * Проверяет, что файловое поле с данным заголовком существует в форме.
      *
      * @param string  $label наименование поля
