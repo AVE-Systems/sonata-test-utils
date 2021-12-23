@@ -580,7 +580,7 @@ HTML;
         );
     }
 
-    public function dataProvider_MultipleSelectFormWithAutocomplete()
+    public function dataProvider_MultipleSelectFormWithAutocomplete(): array
     {
         $html = <<<'HTML'
             <form>
@@ -739,7 +739,7 @@ HTML;
         );
     }
 
-    public function dataProvider_CheckboxForm()
+    public function dataProvider_CheckboxForm(): array
     {
         $html = <<<'HTML'
             <form>
@@ -929,7 +929,7 @@ HTML;
         );
     }
 
-    public function dataProvider_TableForm()
+    public function dataProvider_TableForm(): array
     {
         $html = <<<'HTML'
             <form>
@@ -983,7 +983,7 @@ HTML;
         $this->assertCount(0, $tableCrawler);
     }
 
-    public function dataProvider_ErrorForm()
+    public function dataProvider_ErrorForm(): array
     {
         $html = <<<'HTML'
         <form>
@@ -1067,7 +1067,7 @@ HTML;
         $this->assertFormFieldContainsError($label, $error, $crawler);
     }
 
-    public function dataProvider_TestAssertFileFormFieldExists()
+    public function dataProvider_TestAssertFileFormFieldExists(): array
     {
         $html = <<<'HTML'
         <form>
