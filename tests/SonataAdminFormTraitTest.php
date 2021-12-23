@@ -44,11 +44,27 @@ class SonataAdminFormTraitTest extends TestCase
                                 </label>
                                 <div class="sonata-ba-field sonata-ba-field-standard-natural">
                                   <div class="input-group">
-                                    <div class="input-group date">
+                                    <div class="input-group duration">
                                       <input type="number" 
                                         class="form-control" 
                                         name="sbb9cecc71b[duration]"
                                         value="22"
+                                      >
+                                    </div>
+                                  </div>
+                                </div>
+                              </div>
+                              <div class="form-group">
+                                <label class="control-label required">
+                                  Эл. почта
+                                </label>
+                                <div class="sonata-ba-field sonata-ba-field-standard-natural">
+                                  <div class="input-group">
+                                    <div class="input-group email">
+                                      <input type="email" 
+                                        class="form-control" 
+                                        name="sbb9cecc71b[email]"
+                                        value="user@test.com"
                                       >
                                     </div>
                                   </div>
@@ -195,6 +211,84 @@ HTML;
         $crawler->addHtmlContent($html);
 
         $this->assertFormNumberFieldExists(
+            'Другое поле',
+            $crawler
+        );
+    }
+
+    /**
+     * @dataProvider dataProvider_TestAssertFormFieldValueEquals
+     *
+     * @param string $html
+     */
+    public function testAssertFormEmailFieldValueEquals_ShouldThrowException(
+        string $html
+    ) {
+        $this->expectException(ExpectationFailedException::class);
+        $this->expectExceptionMessage(
+            'Значение в поле ввода email "Эл. почта" не соответствует ожидаемому'
+        );
+
+        $crawler = new Crawler();
+        $crawler->addHtmlContent($html);
+
+        $this->assertFormEmailFieldValueEquals(
+            'some_email@test.com',
+            'Эл. почта',
+            $crawler
+        );
+    }
+
+    /**
+     * @dataProvider dataProvider_TestAssertFormFieldValueEquals
+     *
+     * @param string $html
+     */
+    public function testAssertFormEmailFieldValueEquals_ShouldNotThrowException(
+        string $html
+    ) {
+        $crawler = new Crawler();
+        $crawler->addHtmlContent($html);
+
+        $this->assertFormEmailFieldValueEquals(
+            'user@test.com',
+            'Эл. почта',
+            $crawler
+        );
+    }
+
+    /**
+     * @dataProvider dataProvider_TestAssertFormFieldValueEquals
+     *
+     * @param string $html
+     */
+    public function testAssertEmailFormFieldExists_Exists(string $html)
+    {
+        $crawler = new Crawler();
+        $crawler->addHtmlContent($html);
+
+        $this->assertFormEmailFieldExists(
+            'Эл. почта',
+            $crawler
+        );
+    }
+
+    /**
+     * @dataProvider dataProvider_TestAssertFormFieldValueEquals
+     *
+     * @param string $html
+     */
+    public function testAssertEmailFormFieldExists_NotExists(string $html)
+    {
+        $this->expectException(ExpectationFailedException::class);
+        $this->expectExceptionMessage(
+            'Не найдено email-поле с заголовком "Другое поле"'
+        );
+
+        $crawler = new Crawler();
+        $crawler->addHtmlContent($html);
+
+        $this->assertFormEmailFieldExists(
             'Другое поле',
             $crawler
         );

@@ -87,6 +87,54 @@ trait SonataAdminFormTrait
     }
 
     /**
+     * Проверяет, что содержимое поля ввода email формы, найденного по заголовку,
+     * содержит переданное значение.
+     *
+     * @param Crawler $form корневым узлом должна быть нужная форма
+     */
+    protected function assertFormEmailFieldValueEquals(
+        string $expectedInputValue,
+        string $label,
+        Crawler $form
+    ) {
+        $message = sprintf(
+            'Значение в поле ввода email "%s" не соответствует ожидаемому',
+            $label
+        );
+
+        $constraint = new IsEqual($expectedInputValue);
+
+        $this->assertFormEmailFieldExists($label, $form);
+
+        $inputValue = $this->getNormalizedSpaceFormEmailFieldValue(
+            $label,
+            $form
+        );
+
+        $this->assertThat($inputValue, $constraint, $message);
+    }
+
+    /**
+     * Проверяет, что содержимое email-поле ввода, найденное по заголовку,
+     * присутствует на форме.
+     */
+    protected function assertFormEmailFieldExists(string $label, Crawler $form)
+    {
+        $message = sprintf(
+            'Не найдено email-поле с заголовком "%s"',
+            $label
+        );
+
+        $inputXPath = "//{$this->getFormEmailFieldXPath($label)}";
+
+        $this->assertCount(
+            1,
+            $form->filterXPath($inputXPath),
+            $message
+        );
+    }
+
+    /**
      * Проверяет, что содержимое поля ввода формы, найденного по заголовку,
      * содержит переданное значение.
      *
@@ -670,6 +718,18 @@ trait SonataAdminFormTrait
     }
 
     /**
+     * Возвращает XPath-путь к email-полю формы с заданным заголовком.
+     */
+    private function getFormEmailFieldXPath(string $label): string
+    {
+        $labelXPath = $this->getFormFieldLabelXPath($label);
+        $inputContainerXPath = "div[contains(@class, 'sonata-ba-field')]";
+        $inputXPath = "input[@type='email' and contains(@class, 'form-control')]";
+
+        return "$labelXPath/following-sibling::$inputContainerXPath//$inputXPath";
+    }
+
+    /**
      * Возвращает XPath-путь к полю формы с заданным заголовком.
      *
      * @param string $label
@@ -733,6 +793,19 @@ trait SonataAdminFormTrait
         Crawler $form
     ): string {
         $xPathToNormalize = "//{$this->getFormNumberFieldXPath($label)}/@value";
+
+        return $form->evaluate("normalize-space($xPathToNormalize)")[0];
+    }
+
+    /**
+     * Возвращает содержимое email-поля формы с заданным заголовком без начальных,
+     * конечных и повторяющихся пробелов.
+     */
+    private function getNormalizedSpaceFormEmailFieldValue(
+        string $label,
+        Crawler $form
+    ): string {
+        $xPathToNormalize = "//{$this->getFormEmailFieldXPath($label)}/@value";
 
         return $form->evaluate("normalize-space($xPathToNormalize)")[0];
     }
