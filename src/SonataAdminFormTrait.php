@@ -48,8 +48,10 @@ trait SonataAdminFormTrait
 
         $this->assertFormTextFieldExists($label, $form);
 
+        $inputType = 'text';
+
         $inputValue = $this->getNormalizedSpaceFormInputFieldValue(
-            'text',
+            $inputType,
             $label,
             $form
         );
@@ -79,8 +81,10 @@ trait SonataAdminFormTrait
 
         $this->assertFormNumberFieldExists($label, $form);
 
+        $inputType = 'number';
+
         $inputValue = $this->getNormalizedSpaceFormInputFieldValue(
-            'number',
+            $inputType,
             $label,
             $form
         );
@@ -108,8 +112,10 @@ trait SonataAdminFormTrait
 
         $this->assertFormEmailFieldExists($label, $form);
 
+        $inputType = 'email';
+
         $inputValue = $this->getNormalizedSpaceFormInputFieldValue(
-            'email',
+            $inputType,
             $label,
             $form
         );
@@ -128,7 +134,9 @@ trait SonataAdminFormTrait
             $label
         );
 
-        $inputXPath = "//{$this->getFormInputFieldXPath('email', $label)}";
+        $inputType = 'email';
+
+        $inputXPath = "//{$this->getFormInputFieldXPath($inputType, $label)}";
 
         $this->assertCount(
             1,
@@ -181,7 +189,9 @@ trait SonataAdminFormTrait
             $label
         );
 
-        $inputXPath = "//{$this->getFormInputFieldXPath('text', $label)}";
+        $inputType = 'text';
+
+        $inputXPath = "//{$this->getFormInputFieldXPath($inputType, $label)}";
 
         $this->assertCount(
             1,
@@ -204,7 +214,9 @@ trait SonataAdminFormTrait
             $label
         );
 
-        $inputXPath = "//{$this->getFormInputFieldXPath('number', $label)}";
+        $inputType = 'number';
+
+        $inputXPath = "//{$this->getFormInputFieldXPath($inputType, $label)}";
 
         $this->assertCount(
             1,
