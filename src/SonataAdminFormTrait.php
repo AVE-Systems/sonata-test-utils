@@ -48,7 +48,10 @@ trait SonataAdminFormTrait
 
         $this->assertFormTextFieldExists($label, $form);
 
-        $inputValue = $this->getNormalizedSpaceFormTextFieldValue(
+        $inputType = 'text';
+
+        $inputValue = $this->getNormalizedSpaceFormInputFieldValue(
+            $inputType,
             $label,
             $form
         );
@@ -78,12 +81,68 @@ trait SonataAdminFormTrait
 
         $this->assertFormNumberFieldExists($label, $form);
 
-        $inputValue = $this->getNormalizedSpaceFormNumberFieldValue(
+        $inputType = 'number';
+
+        $inputValue = $this->getNormalizedSpaceFormInputFieldValue(
+            $inputType,
             $label,
             $form
         );
 
         $this->assertThat($inputValue, $constraint, $message);
+    }
+
+    /**
+     * Проверяет, что содержимое поля ввода email формы, найденного по заголовку,
+     * содержит переданное значение.
+     *
+     * @param Crawler $form корневым узлом должна быть нужная форма
+     */
+    protected function assertFormEmailFieldValueEquals(
+        string $expectedInputValue,
+        string $label,
+        Crawler $form
+    ) {
+        $message = sprintf(
+            'Значение в поле ввода email "%s" не соответствует ожидаемому',
+            $label
+        );
+
+        $constraint = new IsEqual($expectedInputValue);
+
+        $this->assertFormEmailFieldExists($label, $form);
+
+        $inputType = 'email';
+
+        $inputValue = $this->getNormalizedSpaceFormInputFieldValue(
+            $inputType,
+            $label,
+            $form
+        );
+
+        $this->assertThat($inputValue, $constraint, $message);
+    }
+
+    /**
+     * Проверяет, что содержимое email-поле ввода, найденное по заголовку,
+     * присутствует на форме.
+     */
+    protected function assertFormEmailFieldExists(string $label, Crawler $form)
+    {
+        $message = sprintf(
+            'Не найдено email-поле с заголовком "%s"',
+            $label
+        );
+
+        $inputType = 'email';
+
+        $inputXPath = "//{$this->getFormInputFieldXPath($inputType, $label)}";
+
+        $this->assertCount(
+            1,
+            $form->filterXPath($inputXPath),
+            $message
+        );
     }
 
     /**
@@ -130,7 +189,9 @@ trait SonataAdminFormTrait
             $label
         );
 
-        $inputXPath = "//{$this->getFormTextFieldXPath($label)}";
+        $inputType = 'text';
+
+        $inputXPath = "//{$this->getFormInputFieldXPath($inputType, $label)}";
 
         $this->assertCount(
             1,
@@ -153,7 +214,9 @@ trait SonataAdminFormTrait
             $label
         );
 
-        $inputXPath = "//{$this->getFormNumberFieldXPath($label)}";
+        $inputType = 'number';
+
+        $inputXPath = "//{$this->getFormInputFieldXPath($inputType, $label)}";
 
         $this->assertCount(
             1,
@@ -638,33 +701,13 @@ trait SonataAdminFormTrait
     }
 
     /**
-     * Возвращает XPath-путь к полю формы с заданным заголовком.
-     *
-     * @param string $label
-     *
-     * @return string
+     * Возвращает XPath-путь к input-полю формы с заданным типом и заголовком.
      */
-    private function getFormTextFieldXPath(string $label): string
+    private function getFormInputFieldXPath(string $type, string $label): string
     {
         $labelXPath = $this->getFormFieldLabelXPath($label);
         $inputContainerXPath = "div[contains(@class, 'sonata-ba-field')]";
-        $inputXPath = "input[@type='text' and contains(@class, 'form-control')]";
-
-        return "$labelXPath/following-sibling::$inputContainerXPath//$inputXPath";
-    }
-
-    /**
-     * Возвращает XPath-путь к числовому полю формы с заданным заголовком.
-     *
-     * @param string $label
-     *
-     * @return string
-     */
-    private function getFormNumberFieldXPath(string $label): string
-    {
-        $labelXPath = $this->getFormFieldLabelXPath($label);
-        $inputContainerXPath = "div[contains(@class, 'sonata-ba-field')]";
-        $inputXPath = "input[@type='number' and contains(@class, 'form-control')]";
+        $inputXPath = "input[@type='{$type}' and contains(@class, 'form-control')]";
 
         return "$labelXPath/following-sibling::$inputContainerXPath//$inputXPath";
     }
@@ -702,37 +745,22 @@ trait SonataAdminFormTrait
     }
 
     /**
-     * Возвращает содержимое поля формы с заданным заголовком без начальных,
-     * конечных и повторяющихся пробелов.
-     *
-     * @param string  $label
-     * @param Crawler $form
-     *
-     * @return string
-     */
-    private function getNormalizedSpaceFormTextFieldValue(
-        string $label,
-        Crawler $form
-    ): string {
-        $xPathToNormalize = "//{$this->getFormTextFieldXPath($label)}/@value";
-
-        return $form->evaluate("normalize-space($xPathToNormalize)")[0];
-    }
-
-    /**
-     * Возвращает содержимое числового поля формы с заданным заголовком без
+     * Возвращает содержимое поля формы с заданными типом и заголовком без
      * начальных, конечных и повторяющихся пробелов.
      *
+     * @param string  $type
      * @param string  $label
      * @param Crawler $form
      *
      * @return string
      */
-    private function getNormalizedSpaceFormNumberFieldValue(
+    private function getNormalizedSpaceFormInputFieldValue(
+        string $type,
         string $label,
         Crawler $form
     ): string {
-        $xPathToNormalize = "//{$this->getFormNumberFieldXPath($label)}/@value";
+        $xPathToNormalize =
+            "//{$this->getFormInputFieldXPath($type, $label)}/@value";
 
         return $form->evaluate("normalize-space($xPathToNormalize)")[0];
     }
