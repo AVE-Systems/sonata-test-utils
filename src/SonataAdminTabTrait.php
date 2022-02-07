@@ -18,7 +18,6 @@ trait SonataAdminTabTrait
     /**
      * Проверяет, что вкладка с заданным именем существует в контейнере.
      *
-     * @param string  $tabLabel
      * @param Crawler $tabsContainer корневым узлом должен быть контейнер,
      *                               содержащий контейнер с ярлыками
      *                               вкладок (ul-список) и контейнер с панелями
@@ -33,7 +32,6 @@ trait SonataAdminTabTrait
     /**
      * Проверяет, что вкладка с заданным именем не существует в контейнере.
      *
-     * @param string  $tabLabel
      * @param Crawler $tabsContainer корневым узлом должен быть контейнер,
      *                               содержащий контейнер с ярлыками
      *                               вкладок (ul-список) и контейнер с панелями
@@ -47,7 +45,6 @@ trait SonataAdminTabTrait
     /**
      * Проверяет, что ярлык вкладки с заданным именем существует в контейнере.
      *
-     * @param string  $tabLabel
      * @param Crawler $tabsContainer корневым узлом должен быть контейнер,
      *                               содержащий контейнер с ярлыками
      *                               вкладок (ul-список) и контейнер с панелями
@@ -65,7 +62,6 @@ trait SonataAdminTabTrait
     /**
      * Проверяет, что ярлык вкладки с заданным именем не существует в контейнере.
      *
-     * @param string  $tabLabel
      * @param Crawler $tabsContainer корневым узлом должен быть контейнер,
      *                               содержащий контейнер с ярлыками
      *                               вкладок (ul-список) и контейнер с панелями
@@ -84,7 +80,6 @@ trait SonataAdminTabTrait
      * Проверяет, что панель вкладки с заданным содержимым ярлыка существует
      * в контейнере.
      *
-     * @param string  $tabLabel
      * @param Crawler $tabsContainer корневым узлом должен быть контейнер,
      *                               содержащий контейнер с ярлыками
      *                               вкладок (ul-список) и контейнер с панелями
@@ -103,8 +98,6 @@ trait SonataAdminTabTrait
 
     /**
      * Возвращает XPath-путь к контейнеру с ярлыками вкладок.
-     *
-     * @return string
      */
     private function tabLabelsContainerXPath(): string
     {
@@ -113,10 +106,6 @@ trait SonataAdminTabTrait
 
     /**
      * Возвращает XPath-путь к ярлыку вкладки по заданному содержимому.
-     *
-     * @param string $tabLabel
-     *
-     * @return string
      */
     private function getTabLabelXPath(string $tabLabel): string
     {
@@ -127,8 +116,6 @@ trait SonataAdminTabTrait
      * Возвращает XPath-путь к панели вкладки с заданным идентификатором.
      *
      * @param string $tabPaneId идентификатор без предшествующего "#"
-     *
-     * @return string
      */
     private function getTabPaneXPath(string $tabPaneId): string
     {
@@ -139,13 +126,10 @@ trait SonataAdminTabTrait
     /**
      * Возвращает XPath-путь к панели вкладки по содержимому ярлыка.
      *
-     * @param string  $tabLabel
      * @param Crawler $tabsContainer корневым узлом должен быть контейнер,
      *                               содержащий контейнер с ярлыками
      *                               вкладок (ul-список) и контейнер с панелями
      *                               вкладок
-     *
-     * @return string
      */
     private function getTabPaneXPathByTabLabel(
         string $tabLabel,
