@@ -210,4 +210,94 @@ HTML;
 
         $this->assertTabNotExists('Портфолио', $crawler->filter('div.nav-tabs-custom'));
     }
+
+    public function dataProvider_Tabs(): array
+    {
+        $html = <<<'HTML'
+<div class="nav-tabs-custom">
+    <ul class="nav nav-tabs">
+        <li>
+            <a href="#tab_1">
+                <i class="fa fa-exclamation-circle has-errors" aria-hidden="true"></i>
+                Salary
+            </a>
+        </li>
+        <li>
+            <a href="#tab_2" data-toggle="tab">
+                <i class="fa fa-exclamation-circle has-errors hide" aria-hidden="true"></i>
+                    Professional activity
+            </a>
+        </li>
+    </ul>
+</div>
+HTML;
+
+        return [[$html]];
+    }
+
+    /**
+     * @dataProvider dataProvider_Tabs
+     */
+    public function testAssertTabExclamationIconExists_ShouldThrowException(
+        string $html
+    ) {
+        $tabLabel = 'Professional activity';
+
+        $this->expectException(ExpectationFailedException::class);
+        $this->expectExceptionMessage(
+            "Tab with title \"{$tabLabel}\" and exclamation mark icon not found"
+        );
+
+        $crawler = new Crawler();
+        $crawler->addHtmlContent($html);
+
+        $this->assertTabExclamationIconExists($tabLabel, $crawler);
+    }
+
+    /**
+     * @dataProvider dataProvider_Tabs
+     */
+    public function testAssertTabExclamationIconExists_ShouldNotThrowException(
+        string $html
+    ) {
+        $crawler = new Crawler();
+        $crawler->addHtmlContent($html);
+
+        $tabLabel = 'Salary';
+
+        $this->assertTabExclamationIconExists($tabLabel, $crawler);
+    }
+
+    /**
+     * @dataProvider dataProvider_Tabs
+     */
+    public function testAssertTabExclamationIconNotExists_ShouldThrowException(
+        string $html
+    ) {
+        $tabLabel = 'Salary';
+
+        $this->expectException(ExpectationFailedException::class);
+        $this->expectExceptionMessage(
+            "Tab with title \"$tabLabel\" and exclamation mark icon exists"
+        );
+
+        $crawler = new Crawler();
+        $crawler->addHtmlContent($html);
+
+        $this->assertTabExclamationIconNotExists($tabLabel, $crawler);
+    }
+
+    /**
+     * @dataProvider dataProvider_Tabs
+     */
+    public function testAssertTabExclamationIconNotExists_ShouldNotThrowException(
+        string $html
+    ) {
+        $crawler = new Crawler();
+        $crawler->addHtmlContent($html);
+
+        $tabLabel = 'Professional activity';
+
+        $this->assertTabExclamationIconNotExists($tabLabel, $crawler);
+    }
 }
