@@ -46,6 +46,37 @@ trait SonataAdminFlashMessagesTrait
             'Успешные флэш-сообщения не содержат текст "'.$message.'".'
         );
     }
+    /**
+     * Позволяет проверить текст "информационного" флэш-сообшения.
+     *
+     * @param string  $message
+     * @param Crawler $crawler
+     */
+    protected function assertFlashInfoMessageExists(
+        string $message,
+        Crawler $crawler
+    ): void {
+        $nodes = $this->findFlashInfoMessages($crawler)->getIterator();
+
+        $this->assertGreaterThan(
+            0,
+            $nodes->count(),
+            'Информационные сообщения отсутствуют на странице!'
+        );
+
+        $matched = false;
+
+        foreach ($nodes as $node) {
+            if (preg_match("~{$message}~", $node->nodeValue)) {
+                $matched = true;
+            }
+        }
+
+        $this->assertTrue(
+            $matched,
+            'Информационные флэш-сообщения не содержат текст "'.$message.'".'
+        );
+    }
 
     /**
      * Позволяет проверить текст "неуспешного" флэш-сообшения в респонсе.
@@ -146,6 +177,19 @@ trait SonataAdminFlashMessagesTrait
     {
         return $crawler
             ->filter('div[class="alert alert-success fade in"]');
+    }
+
+    /**
+     * Поиск информационных флэш сообщений.
+     *
+     * @param Crawler $crawler
+     *
+     * @return Crawler
+     */
+    private function findFlashInfoMessages(Crawler $crawler)
+    {
+        return $crawler
+            ->filter('div[class="alert alert-info fade in"]');
     }
 
     /**

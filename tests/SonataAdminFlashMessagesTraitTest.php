@@ -15,51 +15,60 @@ final class SonataAdminFlashMessagesTraitTest extends TestCase
     {
         $html = <<<'HTML'
 <section class="content">
-  <div class="alert alert-success fade in">
-    <button
-         type="button"
-         class="close"
-         data-dismiss="alert"
-         aria-hidden="true"
-         >&times;</button>
-            Представитель учредителя оповещен.
-  </div>
-  <div class="alert alert-success fade in">
-    <button
-         type="button"
-         class="close"
-         data-dismiss="alert"
-         aria-hidden="true"
-         >&times;</button>
-            Отправлено в архив.
-  </div>
-  <div class="alert alert-warning fade in">
-    <button
-         type="button"
-         class="close"
-         data-dismiss="alert"
-         aria-hidden="true"
-         >&times;</button>
-            Предупреждение.
-  </div>
-  <div class="alert alert-error fade in">
-    <button
-      type="button"
-      class="close"
-      data-dismiss="alert"
-      aria-hidden="true"
-     >&times;</button>
-         Произошла ошибка в редактировании названия.
-  </div>
+    <div class="alert alert-success fade in">
+        <button
+            type="button"
+            class="close"
+            data-dismiss="alert"
+            aria-hidden="true"
+        >&times;</button>
+        Представитель учредителя оповещен.
+    </div>
+    <div class="alert alert-success fade in">
+        <button
+            type="button"
+            class="close"
+            data-dismiss="alert"
+            aria-hidden="true"
+        >&times;</button>
+        Отправлено в архив.
+    </div>
+    <div class="alert alert-warning fade in">
+        <button
+            type="button"
+            class="close"
+            data-dismiss="alert"
+            aria-hidden="true"
+        >&times;</button>
+        Предупреждение.
+    </div>
     <div class="alert alert-error fade in">
-      <button
-        type="button"
-        class="close"
-        data-dismiss="alert"
-        aria-hidden="true"
-       >&times;</button>
-         Не удалось оповестить админа.
-  </div>
+        <button
+            type="button"
+            class="close"
+            data-dismiss="alert"
+            aria-hidden="true"
+        >&times;</button>
+        Произошла ошибка в редактировании названия.
+    </div>
+    <div class="alert alert-error fade in">
+        <button
+            type="button"
+            class="close"
+            data-dismiss="alert"
+            aria-hidden="true"
+        >&times;</button>
+        Не удалось оповестить админа.
+    </div>
+    <div class="alert alert-info fade in">
+        <button 
+            type="button" 
+            class="close" 
+            data-dismiss="alert" 
+            aria-hidden="true"
+        >×</button>
+        Данная справка является архивной.
+    </div>
 </section>
 HTML;
 
@@ -229,6 +238,48 @@ HTML;
         $crawler->addHtmlContent($content);
 
         $this->assertFlashErrorMessagesCount(2, $crawler);
+    }
+
+    /**
+     * @dataProvider dataProviderResponseWithFlashMessages
+     *
+     * @param string $content
+     */
+    public function testAssertFlashInfoMessageExists_UsingResponseWithFlashMessages(
+        string $content
+    ): void {
+        $crawler = $this->getCrawler();
+        $crawler->addHtmlContent($content);
+
+        $this->assertFlashInfoMessageExists(
+            'Данная справка является архивной',
+            $crawler
+        );
+
+        $this->expectException(ExpectationFailedException::class);
+
+        $this->assertFlashInfoMessageExists(
+            'Отправлено в архив',
+            $crawler
+        );
+    }
+
+    /**
+     * @dataProvider dataProviderResponseWithoutFlashMessages
+     *
+     * @param string $content
+     */
+    public function testAssertFlashInfoMessage_UsingResponseWithoutFlashMessages(
+        string $content
+    ): void {
+        $crawler = $this->getCrawler();
+        $crawler->addHtmlContent($content);
+
+        $this->expectException(ExpectationFailedException::class);
+        $this->assertFlashInfoMessageExists(
+            'Оповещение отправлено.',
+            $crawler
+        );
     }
 
     /**
