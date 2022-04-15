@@ -15,58 +15,85 @@ final class SonataAdminFlashMessagesTraitTest extends TestCase
     {
         $html = <<<'HTML'
 <section class="content">
-  <div class="alert alert-success fade in">
-    <button
-         type="button"
-         class="close"
-         data-dismiss="alert"
-         aria-hidden="true"
-         >&times;</button>
-            Представитель учредителя оповещен.
-  </div>
-  <div class="alert alert-success fade in">
-    <button
-         type="button"
-         class="close"
-         data-dismiss="alert"
-         aria-hidden="true"
-         >&times;</button>
-            Отправлено в архив.
-  </div>
-  <div class="alert alert-warning fade in">
-    <button
-         type="button"
-         class="close"
-         data-dismiss="alert"
-         aria-hidden="true"
-         >&times;</button>
-            Предупреждение.
-  </div>
-  <div class="alert alert-error fade in">
-    <button
-      type="button"
-      class="close"
-      data-dismiss="alert"
-      aria-hidden="true"
-     >&times;</button>
-         Произошла ошибка в редактировании названия.
-  </div>
+    <div class="alert alert-success fade in">
+        <button
+            type="button"
+            class="close"
+            data-dismiss="alert"
+            aria-hidden="true"
+        >&times;</button>
+        Представитель учредителя оповещен.
+    </div>
+    <div class="alert alert-success fade in">
+        <button
+            type="button"
+            class="close"
+            data-dismiss="alert"
+            aria-hidden="true"
+        >&times;</button>
+        Отправлено в архив.
+    </div>
+    <div class="alert alert-warning fade in">
+        <button
+            type="button"
+            class="close"
+            data-dismiss="alert"
+            aria-hidden="true"
+        >&times;</button>
+        Предупреждение.
+    </div>
+    <div class="alert alert-warning fade in">
+        <button
+            type="button"
+            class="close"
+            data-dismiss="alert"
+            aria-hidden="true"
+        >&times;</button>
+        Некритичная ошибка.
+    </div>
     <div class="alert alert-error fade in">
-      <button
-        type="button"
-        class="close"
-        data-dismiss="alert"
-        aria-hidden="true"
-       >&times;</button>
-         Не удалось оповестить админа.
-  </div>
+        <button
+            type="button"
+            class="close"
+            data-dismiss="alert"
+            aria-hidden="true"
+        >&times;</button>
+        Произошла ошибка в редактировании названия.
+    </div>
+    <div class="alert alert-error fade in">
+        <button
+            type="button"
+            class="close"
+            data-dismiss="alert"
+            aria-hidden="true"
+        >&times;</button>
+        Не удалось оповестить админа.
+    </div>
+    <div class="alert alert-info fade in">
+        <button 
+            type="button" 
+            class="close" 
+            data-dismiss="alert" 
+            aria-hidden="true"
+        >×</button>
+        Информационное сообщение.
+    </div>
+    <div class="alert alert-info fade in">
+        <button 
+            type="button" 
+            class="close" 
+            data-dismiss="alert" 
+            aria-hidden="true"
+        >×</button>
+        Оповещение.
+    </div>
 </section>
 HTML;
 
         return [[$html]];
     }
 
-    public function dataProviderResponseWithoutFlashMessages(): array
+    public function dataProvider_NoFlash(): array
     {
         $html = <<<'HTML'
 <section class="content">
@@ -90,7 +117,7 @@ HTML;
      *
      * @param string $content
      */
-    public function testAssertFlashSuccessMessageExists_UsingResponseWithFlashMessages(
+    public function testAssertFlashSuccessMessageExists_Success(
         string $content
     ): void {
         $crawler = $this->getCrawler();
@@ -105,7 +132,21 @@ HTML;
             'Отправлено в архив',
             $crawler
         );
+    }
+
+    /**
+     * @dataProvider dataProviderResponseWithFlashMessages
+     *
+     * @param string $content
+     */
+    public function testAssertFlashSuccessMessageExists_OtherType_Fail(
+        string $content
+    ): void {
+        $crawler = $this->getCrawler();
+        $crawler->addHtmlContent($content);
+
         $this->expectException(ExpectationFailedException::class);
+
         $this->assertFlashErrorMessageExists(
             'Отправлено в архив',
             $crawler
@@ -113,17 +154,18 @@ HTML;
     }
 
     /**
-     * @dataProvider dataProviderResponseWithoutFlashMessages
+     * @dataProvider dataProvider_NoFlash
      *
      * @param string $content
      */
-    public function testAssertFlashSuccessMessage_UsingResponseWithoutFlashMessages(
+    public function testAssertFlashSuccessMessage_NoFlash_Fail(
         string $content
     ): void {
         $crawler = $this->getCrawler();
         $crawler->addHtmlContent($content);
 
         $this->expectException(ExpectationFailedException::class);
+
         $this->assertFlashSuccessMessageExists(
             'Оповещение отправлено.',
             $crawler
@@ -135,7 +177,7 @@ HTML;
      *
      * @param string $content
      */
-    public function testAssertFlashWarningMessageExists_UsingResponseWithFlashMessages(
+    public function testAssertFlashWarningMessageExists_Success(
         string $content
     ): void {
         $crawler = $this->getCrawler();
@@ -145,7 +187,26 @@ HTML;
             'Предупреждение',
             $crawler
         );
+
+        $this->assertFlashWarningMessageExists(
+            'Некритичная ошибка',
+            $crawler
+        );
+    }
+
+    /**
+     * @dataProvider dataProviderResponseWithFlashMessages
+     *
+     * @param string $content
+     */
+    public function testAssertFlashWarningMessageExists_OtherType_Fail(
+        string $content
+    ): void {
+        $crawler = $this->getCrawler();
+        $crawler->addHtmlContent($content);
+
         $this->expectException(ExpectationFailedException::class);
+
         $this->assertFlashErrorMessageExists(
             'Предупреждение',
             $crawler
@@ -153,17 +214,18 @@ HTML;
     }
 
     /**
-     * @dataProvider dataProviderResponseWithoutFlashMessages
+     * @dataProvider dataProvider_NoFlash
      *
      * @param string $content
      */
-    public function testAssertFlashWarningMessage_UsingResponseWithoutFlashMessages(
+    public function testAssertFlashWarningMessage_NoFlash_Fail(
         string $content
     ): void {
         $crawler = $this->getCrawler();
         $crawler->addHtmlContent($content);
 
         $this->expectException(ExpectationFailedException::class);
+
         $this->assertFlashWarningMessageExists(
             'Предупреждение',
             $crawler
@@ -175,7 +237,7 @@ HTML;
      *
      * @param string $content
      */
-    public function testAssertFlashErrorMessageExists_UsingResponseWithFlashMessages(
+    public function testAssertFlashErrorMessageExists_Success(
         string $content
     ): void {
         $crawler = $this->getCrawler();
@@ -190,6 +252,18 @@ HTML;
             'Не удалось оповестить админа.',
             $crawler
         );
+    }
+
+    /**
+     * @dataProvider dataProviderResponseWithFlashMessages
+     *
+     * @param string $content
+     */
+    public function testAssertFlashErrorMessageExists_OtherType_Fail(
+        string $content
+    ): void {
+        $crawler = $this->getCrawler();
+        $crawler->addHtmlContent($content);
 
         $this->expectException(ExpectationFailedException::class);
 
@@ -200,17 +274,18 @@ HTML;
     }
 
     /**
-     * @dataProvider dataProviderResponseWithoutFlashMessages
+     * @dataProvider dataProvider_NoFlash
      *
      * @param string $content
      */
-    public function testAssertFlashErrorMessageExists_UsingResponseWithoutFlashMessages(
+    public function testAssertFlashErrorMessageExists_NoFlash_Fail(
         string $content
     ): void {
         $crawler = $this->getCrawler();
         $crawler->addHtmlContent($content);
 
         $this->expectException(ExpectationFailedException::class);
+
         $this->assertFlashErrorMessageExists(
             'Произошла ошибка в редактировании названия.',
             $crawler
@@ -222,7 +297,7 @@ HTML;
      *
      * @param string $content
      */
-    public function testAssertFlashErrorMessagesCount_UsingResponseWithFlashMessages(
+    public function testAssertFlashErrorMessagesCount_Success(
         string $content
     ): void {
         $crawler = $this->getCrawler();
@@ -236,7 +311,83 @@ HTML;
      *
      * @param string $content
      */
-    public function testFindFlashErrorMessages_UsingResponseWithFlashMessages(
+    public function testAssertFlashErrorMessagesCount_Fail(
+        string $content
+    ): void {
+        $crawler = $this->getCrawler();
+        $crawler->addHtmlContent($content);
+
+        $this->expectException(ExpectationFailedException::class);
+
+        $this->assertFlashErrorMessagesCount(1, $crawler);
+    }
+
+    /**
+     * @dataProvider dataProviderResponseWithFlashMessages
+     *
+     * @param string $content
+     */
+    public function testAssertFlashInfoMessageExists_Success(
+        string $content
+    ): void {
+        $crawler = $this->getCrawler();
+        $crawler->addHtmlContent($content);
+
+        $this->assertFlashInfoMessageExists(
+            'Информационное сообщение',
+            $crawler
+        );
+
+        $this->assertFlashInfoMessageExists(
+            'Оповещение',
+            $crawler
+        );
+    }
+
+    /**
+     * @dataProvider dataProviderResponseWithFlashMessages
+     *
+     * @param string $content
+     */
+    public function testAssertFlashInfoMessageExists_OtherType_Fail(
+        string $content
+    ): void {
+        $crawler = $this->getCrawler();
+        $crawler->addHtmlContent($content);
+
+        $this->expectException(ExpectationFailedException::class);
+
+        $this->assertFlashInfoMessageExists(
+            'Отправлено в архив',
+            $crawler
+        );
+    }
+
+    /**
+     * @dataProvider dataProvider_NoFlash
+     *
+     * @param string $content
+     */
+    public function testAssertFlashInfoMessage_NoFlash_Fail(
+        string $content
+    ): void {
+        $crawler = $this->getCrawler();
+        $crawler->addHtmlContent($content);
+
+        $this->expectException(ExpectationFailedException::class);
+
+        $this->assertFlashInfoMessageExists(
+            'Оповещение отправлено.',
+            $crawler
+        );
+    }
+
+    /**
+     * @dataProvider dataProviderResponseWithFlashMessages
+     *
+     * @param string $content
+     */
+    public function testFindFlashErrorMessages(
         string $content
     ): void {
         $crawler = $this->getCrawler();
@@ -245,6 +396,16 @@ HTML;
         $nodes = $this->findFlashErrorMessages($crawler);
 
         $this->assertCount(2, $nodes);
+
+        $this->assertEquals(
+            '× Произошла ошибка в редактировании названия.',
+            $nodes->eq(0)->text()
+        );
+
+        $this->assertEquals(
+            '× Не удалось оповестить админа.',
+            $nodes->eq(1)->text()
+        );
     }
 
     /**
@@ -252,7 +413,7 @@ HTML;
      *
      * @param string $content
      */
-    public function testFindFlashSuccessMessages_UsingResponseWithFlashMessages(
+    public function testFindFlashSuccessMessages(
         string $content
     ): void {
         $crawler = $this->getCrawler();
@@ -261,6 +422,16 @@ HTML;
         $nodes = $this->findFlashSuccessMessages($crawler);
 
         $this->assertCount(2, $nodes);
+
+        $this->assertEquals(
+            '× Представитель учредителя оповещен.',
+            $nodes->eq(0)->text()
+        );
+
+        $this->assertEquals(
+            '× Отправлено в архив.',
+            $nodes->eq(1)->text()
+        );
     }
 
     /**
@@ -268,7 +439,7 @@ HTML;
      *
      * @param string $content
      */
-    public function testFindFlashWarningMessages_UsingResponseWithFlashMessages(
+    public function testFindFlashWarningMessages(
         string $content
     ): void {
         $crawler = $this->getCrawler();
@@ -276,7 +447,43 @@ HTML;
 
         $nodes = $this->findFlashWarningMessages($crawler);
 
-        $this->assertCount(1, $nodes);
+        $this->assertCount(2, $nodes);
+
+        $this->assertEquals(
+            '× Предупреждение.',
+            $nodes->eq(0)->text()
+        );
+
+        $this->assertEquals(
+            '× Некритичная ошибка.',
+            $nodes->eq(1)->text()
+        );
+    }
+
+    /**
+     * @dataProvider dataProviderResponseWithFlashMessages
+     *
+     * @param string $content
+     */
+    public function testFindFlashInfoMessages(
+        string $content
+    ): void {
+        $crawler = $this->getCrawler();
+        $crawler->addHtmlContent($content);
+
+        $nodes = $this->findFlashInfoMessages($crawler);
+
+        $this->assertCount(2, $nodes);
+
+        $this->assertEquals(
+            '× Информационное сообщение.',
+            $nodes->eq(0)->text()
+        );
+
+        $this->assertEquals(
+            '× Оповещение.',
+            $nodes->eq(1)->text()
+        );
     }
 
     public function getCrawler(): Crawler
