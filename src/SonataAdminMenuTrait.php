@@ -10,6 +10,7 @@ use Symfony\Component\DomCrawler\Crawler;
  * Должен использоваться в тестах, наследованных от "TestCase".
  *
  * @method void assertCount(int $expectedCount, $haystack, string $message = '')
+ * @method void assertEquals($expected, $actual, string $message = '', float $delta = 0.0, int $maxDepth = 10, bool $canonicalize = false, bool $ignoreCase = false)
  *
  * @see Assert::assertCount
  */
@@ -49,22 +50,39 @@ trait SonataAdminMenuTrait
 
     /**
      * Проверяет, что пункт с заданным названием в списке меню.
-     *
-     * @param Crawler $crawler
-     * @param string  $menuItem название пункта меню
      */
-    protected function assertMenuItemExists(Crawler $crawler, string $menuItem)
-    {
+    protected function assertMenuItemExists(
+        Crawler $crawler,
+        string $menuItem,
+        string $expectedUrl = null
+    ) {
         $menuXPath = $this->getMenuXPath();
         $itemXPath = $this->getMenuItemXPath($menuItem);
 
         $xpath = "//$menuXPath//$itemXPath";
 
+        $link = $crawler->filterXPath($xpath);
+
         $this->assertCount(
             1,
-            $crawler->filterXPath($xpath),
+            $link,
             sprintf('В меню нет пункта "%s"', $menuItem)
         );
+
+        if ($expectedUrl !== null) {
+            $actualUrl = $link->attr('href');
+
+            $this->assertEquals(
+                $expectedUrl,
+                $actualUrl,
+                sprintf(
+                    'Пункт меню "%s" ведёт на "%s", а не на "%s"',
+                    $menuItem,
+                    $actualUrl,
+                    $expectedUrl
+                )
+            );
+        }
     }
 
     /**
@@ -92,23 +110,37 @@ trait SonataAdminMenuTrait
     /**
      * Проверяет, что пункт с заданным названием есть в определённой группе
      * меню.
-     *
-     * @param Crawler $crawler
-     * @param string  $menuItem  название пункта меню
-     * @param string  $menuGroup название группы меню
      */
     protected function assertMenuItemInGroupExists(
         Crawler $crawler,
         string $menuItem,
-        string $menuGroup
+        string $menuGroup,
+        string $expectedUrl = null
     ) {
         $xpath = $this->getMenuItemInGroupXPath($menuGroup, $menuItem);
 
+        $link = $crawler->filterXPath($xpath);
+
         $this->assertCount(
             1,
-            $crawler->filterXPath($xpath),
+            $link,
             sprintf('В группе меню "%s" нет пункта "%s"', $menuGroup, $menuItem)
         );
+
+        if ($expectedUrl !== null) {
+            $actualUrl = $link->attr('href');
+
+            $this->assertEquals(
+                $expectedUrl,
+                $actualUrl,
+                sprintf(
+                    'Пункт меню "%s" ведёт на "%s", а не на "%s"',
+                    $menuItem,
+                    $actualUrl,
+                    $expectedUrl
+                )
+            );
+        }
     }
 
     /**

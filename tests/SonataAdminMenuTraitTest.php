@@ -198,6 +198,53 @@ HTML;
      *
      * @param string $html
      */
+    public function testAssertMenuItemExists_WithUrl_ShouldThrowException(
+        string $html
+    ) {
+        $this->expectException(ExpectationFailedException::class);
+        $this->expectExceptionMessageMatches(
+            '.Пункт меню "Адрес поддержки" ведёт на "mailto:result@mioo\.ru", а не на "mailto:result".'
+        );
+
+        $crawler = new Crawler();
+        $crawler->addHtmlContent($html);
+
+        $this->assertMenuItemExists(
+            $crawler,
+            'Адрес поддержки',
+            'mailto:result'
+        );
+    }
+
+    /**
+     * @dataProvider dataProvider_TestAssertMenuItem
+     *
+     * @param string $html
+     */
+    public function testAssertMenuItemExists_WithUrl_ShouldNotThrowException(
+        string $html
+    ) {
+        $crawler = new Crawler();
+        $crawler->addHtmlContent($html);
+
+        $this->assertMenuItemExists(
+            $crawler,
+            'Адрес поддержки',
+            'mailto:result@mioo.ru'
+        );
+
+        $this->assertMenuItemExists(
+            $crawler,
+            'Управляющий совет',
+            '#'
+        );
+    }
+
+    /**
+     * @dataProvider dataProvider_TestAssertMenuItem
+     *
+     * @param string $html
+     */
     public function testAssertMenuItemNotExists_ShouldThrowException(
         string $html
     ) {
@@ -264,6 +311,49 @@ HTML;
             $crawler,
             'Информация о заседаниях',
             'Управляющий совет'
+        );
+    }
+
+    /**
+     * @dataProvider dataProvider_TestAssertMenuItem
+     *
+     * @param string $html
+     */
+    public function testAssertMenuItemInGroupExists_WithUrl_ShouldThrowException(
+        string $html
+    ) {
+        $this->expectException(ExpectationFailedException::class);
+        $this->expectExceptionMessageMatches(
+            '.Пункт меню "Информация о заседаниях" ведёт на "/managerialcouncil/list", а не на "/managerialcouncil".'
+        );
+
+        $crawler = new Crawler();
+        $crawler->addHtmlContent($html);
+
+        $this->assertMenuItemInGroupExists(
+            $crawler,
+            'Информация о заседаниях',
+            'Управляющий совет',
+            '/managerialcouncil'
+        );
+    }
+
+    /**
+     * @dataProvider dataProvider_TestAssertMenuItem
+     *
+     * @param string $html
+     */
+    public function testAssertMenuItemInGroupExists_WithUrl_ShouldNotThrowException(
+        string $html
+    ) {
+        $crawler = new Crawler();
+        $crawler->addHtmlContent($html);
+
+        $this->assertMenuItemInGroupExists(
+            $crawler,
+            'Информация о заседаниях',
+            'Управляющий совет',
+            '/managerialcouncil/list'
         );
     }
 
