@@ -166,6 +166,29 @@ trait SonataAdminMenuTrait
     }
 
     /**
+     * Проверяет, что названия пунктов меню и иерархия в определённой группе
+     * соответствуют переданному значению.
+     */
+    protected function assertMenuItemsInGroupEqual(
+        Crawler $crawler,
+        array $expectedMenuHierarchyLabels,
+        string $menuGroup
+    ) {
+        $menuXPath = $this->getMenuXPath();
+        $groupMenuXPath = "//$menuXPath//{$this->getMenuGroupMenuXPath($menuGroup)}";
+
+        $groupMenu = $crawler->filterXPath($groupMenuXPath);
+
+        $actualMenuHierarchyLabels = $this->retrieveMenuLabels($groupMenu);
+
+        $this->assertAssocArraysEqual(
+            $expectedMenuHierarchyLabels,
+            $actualMenuHierarchyLabels,
+            sprintf('Не совпадает порядок пунктов меню в группе "%s"', $menuGroup)
+        );
+    }
+
+    /**
      * Проверяет, что названия пунктов меню и иерархия соответствуют
      * переданному значению.
      *
@@ -189,33 +212,9 @@ trait SonataAdminMenuTrait
 
         $actualMenuHierarchyLabels = $this->retrieveMenuLabels($menu);
 
-        $this->assertEquals(
+        $this->assertAssocArraysEqual(
             $expectedMenuHierarchyLabels,
-            $actualMenuHierarchyLabels
-        );
-
-        // При сравнении ассоциативных массивов, не учитывается порядок ключей,
-        // поэтому нужна дополнительная проверка
-        $expectedOrderedKeys = [];
-        $actualOrderedKeys = [];
-
-        array_walk_recursive(
-            $expectedMenuHierarchyLabels,
-            function ($value, $key) use (&$expectedOrderedKeys) {
-                $expectedOrderedKeys[] = $key;
-            }
-        );
-
-        array_walk_recursive(
             $actualMenuHierarchyLabels,
-            function ($value, $key) use (&$actualOrderedKeys) {
-                $actualOrderedKeys[] = $key;
-            }
-        );
-
-        $this->assertEquals(
-            $expectedOrderedKeys,
-            $actualOrderedKeys,
             'Не совпадает порядок пунктов меню'
         );
     }
@@ -234,9 +233,7 @@ trait SonataAdminMenuTrait
         $groupXMenuPath = $this->getMenuGroupMenuXPath($menuGroup);
         $itemXPath = $this->getMenuItemXPath($menuItem);
 
-        $xpath = "//$menuXPath//$groupXMenuPath//$itemXPath";
-
-        return $xpath;
+        return "//$menuXPath//$groupXMenuPath//$itemXPath";
     }
 
     /**
@@ -262,7 +259,7 @@ trait SonataAdminMenuTrait
     }
 
     /**
-     * Возвращает XPath-путь к меню группы  по названию в меню
+     * Возвращает XPath-путь к меню группы по названию в меню
      * SonataAdminBundle.
      *
      * @param string $menuGroup
@@ -323,5 +320,34 @@ trait SonataAdminMenuTrait
         );
 
         return $menuLabels;
+    }
+
+    private function assertAssocArraysEqual(
+        array $expectedArray,
+        array $actualArray,
+        string $message
+    ) {
+        $this->assertEquals($expectedArray, $actualArray);
+
+        // При сравнении ассоциативных массивов, не учитывается порядок ключей,
+        // поэтому нужна дополнительная проверка
+        $expectedOrderedKeys = [];
+        $actualOrderedKeys = [];
+
+        array_walk_recursive(
+            $expectedArray,
+            function ($value, $key) use (&$expectedOrderedKeys) {
+                $expectedOrderedKeys[] = $key;
+            }
+        );
+
+        array_walk_recursive(
+            $actualArray,
+            function ($value, $key) use (&$actualOrderedKeys) {
+                $actualOrderedKeys[] = $key;
+            }
+        );
+
+        $this->assertEquals($expectedOrderedKeys, $actualOrderedKeys, $message);
     }
 }

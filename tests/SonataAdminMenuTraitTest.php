@@ -50,7 +50,7 @@ HTML;
                         Информация о заседаниях
                       </a>      
                     </li>
-                    <li class="last">
+                    <li class="last treeview">
                       <a href="#">
                         <i class="fa fa-sitemap"></i>
                         <span>Представители учредителя</span>
@@ -394,6 +394,115 @@ HTML;
         $this->assertMenuItemInGroupNotExists(
             $crawler,
             'Адрес поддержки',
+            'Управляющий совет'
+        );
+    }
+
+    /**
+     * @dataProvider dataProvider_TestAssertMenuItem
+     *
+     * @param string $html
+     */
+    public function testAssertMenuItemsInGroupEqual_ShouldNotThrowException(
+        string $html
+    ) {
+        $crawler = new Crawler();
+        $crawler->addHtmlContent($html);
+
+        $this->assertMenuItemsInGroupEqual(
+            $crawler,
+            [
+                'Информация о заседаниях',
+                'Представители учредителя' => [
+                    'Создать новый',
+                    'Показать список',
+                ],
+            ],
+            'Управляющий совет'
+        );
+    }
+
+    /**
+     * @dataProvider dataProvider_TestAssertMenuItem
+     *
+     * @param string $html
+     */
+    public function testAssertMenuItemsInGroupEqual_ShouldThrowException_InvalidItemPosition(
+        string $html
+    ) {
+        $crawler = new Crawler();
+        $crawler->addHtmlContent($html);
+
+        $this->expectException(ExpectationFailedException::class);
+        $this->expectExceptionMessageMatches(
+            '.Не совпадает порядок пунктов меню.'
+        );
+
+        $this->assertMenuItemsInGroupEqual(
+            $crawler,
+            [
+                'Представители учредителя' => [
+                    'Создать новый',
+                    'Показать список',
+                ],
+                'Информация о заседаниях', // должен быть выше
+            ],
+            'Управляющий совет'
+        );
+    }
+
+    /**
+     * @dataProvider dataProvider_TestAssertMenuItem
+     *
+     * @param string $html
+     */
+    public function testAssertMenuItemsInGroupEqual_ShouldThrowException_MissingItemInGroup(
+        string $html
+    ) {
+        $crawler = new Crawler();
+        $crawler->addHtmlContent($html);
+
+        $this->expectException(ExpectationFailedException::class);
+        $this->expectExceptionMessageMatches(
+            '.Failed asserting that two arrays are equal.'
+        );
+
+        $this->assertMenuItemsInGroupEqual(
+            $crawler,
+            [
+                'Информация о заседаниях',
+                // отсутствует пункт меню "Представители учредителя"
+            ],
+            'Управляющий совет'
+        );
+    }
+
+    /**
+     * @dataProvider dataProvider_TestAssertMenuItem
+     *
+     * @param string $html
+     */
+    public function testAssertMenuItemsInGroupEqual_ShouldThrowException_ExtraItem(
+        string $html
+    ) {
+        $crawler = new Crawler();
+        $crawler->addHtmlContent($html);
+
+        $this->expectException(ExpectationFailedException::class);
+        $this->expectExceptionMessageMatches(
+            '.Failed asserting that two arrays are equal.'
+        );
+
+        $this->assertMenuItemsInGroupEqual(
+            $crawler,
+            [
+                'Информация о заседаниях',
+                'Представители учредителя' => [
+                    'Создать новый',
+                    'Показать список',
+                ],
+                'Информация об организации', // лишний пункт
+            ],
             'Управляющий совет'
         );
     }
