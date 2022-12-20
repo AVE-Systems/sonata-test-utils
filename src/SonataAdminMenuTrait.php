@@ -12,7 +12,8 @@ use Symfony\Component\DomCrawler\Crawler;
  * @method void assertCount(int $expectedCount, $haystack, string $message = '')
  * @method void assertEquals($expected, $actual, string $message = '', float $delta = 0.0, int $maxDepth = 10, bool $canonicalize = false, bool $ignoreCase = false)
  *
- * @see Assert::assertCount
+ * @see Assert::assertCount()
+ * @see Assert::assertEquals()
  */
 trait SonataAdminMenuTrait
 {
@@ -181,7 +182,7 @@ trait SonataAdminMenuTrait
 
         $actualMenuHierarchyLabels = $this->retrieveMenuLabels($groupMenu);
 
-        $this->assertAssocArraysEqual(
+        $this->assertAssocArraysEqualNotIgnoringOrder(
             $expectedMenuHierarchyLabels,
             $actualMenuHierarchyLabels,
             sprintf('Не совпадает порядок пунктов меню в группе "%s"', $menuGroup)
@@ -212,7 +213,7 @@ trait SonataAdminMenuTrait
 
         $actualMenuHierarchyLabels = $this->retrieveMenuLabels($menu);
 
-        $this->assertAssocArraysEqual(
+        $this->assertAssocArraysEqualNotIgnoringOrder(
             $expectedMenuHierarchyLabels,
             $actualMenuHierarchyLabels,
             'Не совпадает порядок пунктов меню'
@@ -322,15 +323,16 @@ trait SonataAdminMenuTrait
         return $menuLabels;
     }
 
-    private function assertAssocArraysEqual(
+    /**
+     * Для сравнения ассоциативных массивов, учитывается порядок ключей.
+     */
+    private function assertAssocArraysEqualNotIgnoringOrder(
         array $expectedArray,
         array $actualArray,
         string $message
     ) {
         $this->assertEquals($expectedArray, $actualArray);
 
-        // При сравнении ассоциативных массивов, не учитывается порядок ключей,
-        // поэтому нужна дополнительная проверка
         $expectedOrderedKeys = [];
         $actualOrderedKeys = [];
 
