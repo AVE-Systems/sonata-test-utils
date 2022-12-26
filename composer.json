@@ -3,7 +3,7 @@
   "description": "Utils for testing SonataAdminBundle",
   "homepage": "https://github.com/AVE-Systems/sonata-test-utils",
   "license": "Apache-2.0",
-  "version": "0.2.0",
+  "version": "1.0.0",
   "type": "library",
   "authors": [
     {
