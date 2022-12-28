@@ -12,7 +12,8 @@ use Symfony\Component\DomCrawler\Crawler;
  * @method void assertCount(int $expectedCount, $haystack, string $message = '')
  * @method void assertEquals($expected, $actual, string $message = '', float $delta = 0.0, int $maxDepth = 10, bool $canonicalize = false, bool $ignoreCase = false)
  *
- * @see Assert::assertCount
+ * @see Assert::assertCount()
+ * @see Assert::assertEquals()
  */
 trait SonataAdminMenuTrait
 {
@@ -166,6 +167,29 @@ trait SonataAdminMenuTrait
     }
 
     /**
+     * Проверяет, что названия пунктов меню и иерархия в определённой группе
+     * соответствуют переданному значению.
+     */
+    protected function assertMenuItemsInGroupEqual(
+        Crawler $crawler,
+        array $expectedMenuHierarchyLabels,
+        string $menuGroup
+    ) {
+        $menuXPath = $this->getMenuXPath();
+        $groupMenuXPath = "//$menuXPath//{$this->getMenuGroupMenuXPath($menuGroup)}";
+
+        $groupMenu = $crawler->filterXPath($groupMenuXPath);
+
+        $actualMenuHierarchyLabels = $this->retrieveMenuLabels($groupMenu);
+
+        $this->assertAssocArraysEqualNotIgnoringOrder(
+            $expectedMenuHierarchyLabels,
+            $actualMenuHierarchyLabels,
+            sprintf('Не совпадает порядок пунктов меню в группе "%s"', $menuGroup)
+        );
+    }
+
+    /**
      * Проверяет, что названия пунктов меню и иерархия соответствуют
      * переданному значению.
      *
@@ -189,33 +213,9 @@ trait SonataAdminMenuTrait
 
         $actualMenuHierarchyLabels = $this->retrieveMenuLabels($menu);
 
-        $this->assertEquals(
+        $this->assertAssocArraysEqualNotIgnoringOrder(
             $expectedMenuHierarchyLabels,
-            $actualMenuHierarchyLabels
-        );
-
-        // При сравнении ассоциативных массивов, не учитывается порядок ключей,
-        // поэтому нужна дополнительная проверка
-        $expectedOrderedKeys = [];
-        $actualOrderedKeys = [];
-
-        array_walk_recursive(
-            $expectedMenuHierarchyLabels,
-            function ($value, $key) use (&$expectedOrderedKeys) {
-                $expectedOrderedKeys[] = $key;
-            }
-        );
-
-        array_walk_recursive(
             $actualMenuHierarchyLabels,
-            function ($value, $key) use (&$actualOrderedKeys) {
-                $actualOrderedKeys[] = $key;
-            }
-        );
-
-        $this->assertEquals(
-            $expectedOrderedKeys,
-            $actualOrderedKeys,
             'Не совпадает порядок пунктов меню'
         );
     }
@@ -234,9 +234,7 @@ trait SonataAdminMenuTrait
         $groupXMenuPath = $this->getMenuGroupMenuXPath($menuGroup);
         $itemXPath = $this->getMenuItemXPath($menuItem);
 
-        $xpath = "//$menuXPath//$groupXMenuPath//$itemXPath";
-
-        return $xpath;
+        return "//$menuXPath//$groupXMenuPath//$itemXPath";
     }
 
     /**
@@ -262,7 +260,7 @@ trait SonataAdminMenuTrait
     }
 
     /**
-     * Возвращает XPath-путь к меню группы  по названию в меню
+     * Возвращает XPath-путь к меню группы по названию в меню
      * SonataAdminBundle.
      *
      * @param string $menuGroup
@@ -323,5 +321,35 @@ trait SonataAdminMenuTrait
         );
 
         return $menuLabels;
+    }
+
+    /**
+     * Для сравнения ассоциативных массивов, учитывается порядок ключей.
+     */
+    private function assertAssocArraysEqualNotIgnoringOrder(
+        array $expectedArray,
+        array $actualArray,
+        string $message
+    ) {
+        $this->assertEquals($expectedArray, $actualArray);
+
+        $expectedOrderedKeys = [];
+        $actualOrderedKeys = [];
+
+        array_walk_recursive(
+            $expectedArray,
+            function ($value, $key) use (&$expectedOrderedKeys) {
+                $expectedOrderedKeys[] = $key;
+            }
+        );
+
+        array_walk_recursive(
+            $actualArray,
+            function ($value, $key) use (&$actualOrderedKeys) {
+                $actualOrderedKeys[] = $key;
+            }
+        );
+
+        $this->assertEquals($expectedOrderedKeys, $actualOrderedKeys, $message);
     }
 }

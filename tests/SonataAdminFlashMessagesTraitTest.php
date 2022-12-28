@@ -124,12 +124,12 @@ HTML;
         $crawler->addHtmlContent($content);
 
         $this->assertFlashSuccessMessageExists(
-            'Представитель учредителя оповещен',
+            '× Представитель учредителя оповещен.',
             $crawler
         );
 
         $this->assertFlashSuccessMessageExists(
-            'Отправлено в архив',
+            '× Отправлено в архив.',
             $crawler
         );
     }
@@ -148,7 +148,7 @@ HTML;
         $this->expectException(ExpectationFailedException::class);
 
         $this->assertFlashErrorMessageExists(
-            'Отправлено в архив',
+            '× Отправлено в архив',
             $crawler
         );
     }
@@ -167,7 +167,7 @@ HTML;
         $this->expectException(ExpectationFailedException::class);
 
         $this->assertFlashSuccessMessageExists(
-            'Оповещение отправлено.',
+            '× Оповещение отправлено.',
             $crawler
         );
     }
@@ -184,12 +184,12 @@ HTML;
         $crawler->addHtmlContent($content);
 
         $this->assertFlashWarningMessageExists(
-            'Предупреждение',
+            '× Предупреждение.',
             $crawler
         );
 
         $this->assertFlashWarningMessageExists(
-            'Некритичная ошибка',
+            '× Некритичная ошибка.',
             $crawler
         );
     }
@@ -208,7 +208,7 @@ HTML;
         $this->expectException(ExpectationFailedException::class);
 
         $this->assertFlashErrorMessageExists(
-            'Предупреждение',
+            '× Предупреждение',
             $crawler
         );
     }
@@ -227,7 +227,7 @@ HTML;
         $this->expectException(ExpectationFailedException::class);
 
         $this->assertFlashWarningMessageExists(
-            'Предупреждение',
+            '× Предупреждение',
             $crawler
         );
     }
@@ -244,12 +244,12 @@ HTML;
         $crawler->addHtmlContent($content);
 
         $this->assertFlashErrorMessageExists(
-            'Произошла ошибка в редактировании названия.',
+            '× Произошла ошибка в редактировании названия.',
             $crawler
         );
 
         $this->assertFlashErrorMessageExists(
-            'Не удалось оповестить админа.',
+            '× Не удалось оповестить админа.',
             $crawler
         );
     }
@@ -268,7 +268,7 @@ HTML;
         $this->expectException(ExpectationFailedException::class);
 
         $this->assertFlashSuccessMessageExists(
-            'Не удалось оповестить админа.',
+            '× Не удалось оповестить админа.',
             $crawler
         );
     }
@@ -287,7 +287,7 @@ HTML;
         $this->expectException(ExpectationFailedException::class);
 
         $this->assertFlashErrorMessageExists(
-            'Произошла ошибка в редактировании названия.',
+            '× Произошла ошибка в редактировании названия.',
             $crawler
         );
     }
@@ -334,12 +334,12 @@ HTML;
         $crawler->addHtmlContent($content);
 
         $this->assertFlashInfoMessageExists(
-            'Информационное сообщение',
+            '× Информационное сообщение.',
             $crawler
         );
 
         $this->assertFlashInfoMessageExists(
-            'Оповещение',
+            '× Оповещение.',
             $crawler
         );
     }
@@ -358,7 +358,7 @@ HTML;
         $this->expectException(ExpectationFailedException::class);
 
         $this->assertFlashInfoMessageExists(
-            'Отправлено в архив',
+            '× Отправлено в архив',
             $crawler
         );
     }
@@ -377,7 +377,7 @@ HTML;
         $this->expectException(ExpectationFailedException::class);
 
         $this->assertFlashInfoMessageExists(
-            'Оповещение отправлено.',
+            '× Оповещение отправлено.',
             $crawler
         );
     }
@@ -393,18 +393,14 @@ HTML;
         $crawler = $this->getCrawler();
         $crawler->addHtmlContent($content);
 
-        $nodes = $this->findFlashErrorMessages($crawler);
-
-        $this->assertCount(2, $nodes);
+        $messages = $this->findFlashErrorMessages($crawler);
 
         $this->assertEquals(
-            '× Произошла ошибка в редактировании названия.',
-            $nodes->eq(0)->text()
-        );
-
-        $this->assertEquals(
-            '× Не удалось оповестить админа.',
-            $nodes->eq(1)->text()
+            [
+                '× Произошла ошибка в редактировании названия.',
+                '× Не удалось оповестить админа.'
+            ],
+            $messages
         );
     }
 
@@ -419,18 +415,14 @@ HTML;
         $crawler = $this->getCrawler();
         $crawler->addHtmlContent($content);
 
-        $nodes = $this->findFlashSuccessMessages($crawler);
-
-        $this->assertCount(2, $nodes);
+        $messages = $this->findFlashSuccessMessages($crawler);
 
         $this->assertEquals(
-            '× Представитель учредителя оповещен.',
-            $nodes->eq(0)->text()
-        );
-
-        $this->assertEquals(
-            '× Отправлено в архив.',
-            $nodes->eq(1)->text()
+            [
+                '× Представитель учредителя оповещен.',
+                '× Отправлено в архив.'
+            ],
+            $messages
         );
     }
 
@@ -445,18 +437,14 @@ HTML;
         $crawler = $this->getCrawler();
         $crawler->addHtmlContent($content);
 
-        $nodes = $this->findFlashWarningMessages($crawler);
-
-        $this->assertCount(2, $nodes);
+        $messages = $this->findFlashWarningMessages($crawler);
 
         $this->assertEquals(
-            '× Предупреждение.',
-            $nodes->eq(0)->text()
-        );
-
-        $this->assertEquals(
-            '× Некритичная ошибка.',
-            $nodes->eq(1)->text()
+            [
+                '× Предупреждение.',
+                '× Некритичная ошибка.'
+            ],
+            $messages
         );
     }
 
@@ -471,18 +459,14 @@ HTML;
         $crawler = $this->getCrawler();
         $crawler->addHtmlContent($content);
 
-        $nodes = $this->findFlashInfoMessages($crawler);
-
-        $this->assertCount(2, $nodes);
+        $messages = $this->findFlashInfoMessages($crawler);
 
         $this->assertEquals(
-            '× Информационное сообщение.',
-            $nodes->eq(0)->text()
-        );
-
-        $this->assertEquals(
-            '× Оповещение.',
-            $nodes->eq(1)->text()
+            [
+                '× Информационное сообщение.',
+                '× Оповещение.',
+            ],
+            $messages
         );
     }
 
