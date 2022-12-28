@@ -7,13 +7,13 @@ use Symfony\Component\DomCrawler\Crawler;
 /**
  * Makes easier flash messages checking.
  *
- * @method void assertGreaterThan(int $expected, $actual, string $message = '')
+ * @method void assertContains($needle, $haystack, string $message = '', bool $ignoreCase = false, bool $checkForObjectIdentity = true, bool $checkForNonObjectIdentity = false)
  * @method void assertTrue($condition, string $message = '')
  * @method void assertEquals($expected, $actual, string $message = '', float $delta = 0.0, int $maxDepth = 10, bool $canonicalize = false, bool $ignoreCase = false)
  *
- * @see Assert::assertGreaterThan
- * @see Assert::assertTrue
- * @see Assert::assertEquals
+ * @see Assert::assertContains()
+ * @see Assert::assertTrue()
+ * @see Assert::assertEquals()
  */
 trait SonataAdminFlashMessagesTrait
 {
@@ -27,22 +27,9 @@ trait SonataAdminFlashMessagesTrait
         string $message,
         Crawler $crawler
     ): void {
-        $nodes = $this->findFlashSuccessMessages($crawler)->getIterator();
-
-        $this->assertGreaterThan(
-            0,
-            $nodes->count(),
-            'No success flash messages'
-        );
-
-        $matched = false;
-        foreach ($nodes as $node) {
-            if (preg_match("~{$message}~", $node->nodeValue)) {
-                $matched = true;
-            }
-        }
-        $this->assertTrue(
-            $matched,
+        $this->assertContains(
+            $message,
+            $this->findFlashSuccessMessages($crawler),
             'No success flash messages with text "'.$message.'".'
         );
     }
@@ -56,24 +43,9 @@ trait SonataAdminFlashMessagesTrait
         string $message,
         Crawler $crawler
     ): void {
-        $nodes = $this->findFlashInfoMessages($crawler)->getIterator();
-
-        $this->assertGreaterThan(
-            0,
-            $nodes->count(),
-            'No info flash messages'
-        );
-
-        $matched = false;
-
-        foreach ($nodes as $node) {
-            if (preg_match("~{$message}~", $node->nodeValue)) {
-                $matched = true;
-            }
-        }
-
-        $this->assertTrue(
-            $matched,
+        $this->assertContains(
+            $message,
+            $this->findFlashInfoMessages($crawler),
             'No info flash messages with text "'.$message.'".'
         );
     }
@@ -88,22 +60,9 @@ trait SonataAdminFlashMessagesTrait
         string $error,
         Crawler $crawler
     ): void {
-        $nodes = $this->findFlashErrorMessages($crawler)->getIterator();
-
-        $this->assertGreaterThan(
-            0,
-            $nodes->count(),
-            'No error flash messages'
-        );
-
-        $matched = false;
-        foreach ($nodes as $node) {
-            if (preg_match("~{$error}~", $node->nodeValue)) {
-                $matched = true;
-            }
-        }
-        $this->assertTrue(
-            $matched,
+        $this->assertContains(
+            $error,
+            $this->findFlashErrorMessages($crawler),
             'No error flash messages with text "'.$error.'".'
         );
     }
@@ -116,9 +75,9 @@ trait SonataAdminFlashMessagesTrait
      */
     protected function assertFlashErrorMessagesCount(int $count, Crawler $crawler)
     {
-        $this->assertEquals(
+        $this->assertCount(
             $count,
-            $this->findFlashErrorMessages($crawler)->count()
+            $this->findFlashErrorMessages($crawler)
         );
     }
 
@@ -132,22 +91,9 @@ trait SonataAdminFlashMessagesTrait
         string $expectedMessage,
         Crawler $crawler
     ): void {
-        $nodes = $this->findFlashWarningMessages($crawler)->getIterator();
-
-        $this->assertGreaterThan(
-            0,
-            $nodes->count(),
-            'No warning flash messages'
-        );
-
-        $matched = false;
-        foreach ($nodes as $node) {
-            if (preg_match("~{$expectedMessage}~", $node->nodeValue)) {
-                $matched = true;
-            }
-        }
-        $this->assertTrue(
-            $matched,
+        $this->assertContains(
+            $expectedMessage,
+            $this->findFlashWarningMessages($crawler),
             'No warning flash messages with text "'.$expectedMessage.'".'
         );
     }
@@ -155,52 +101,56 @@ trait SonataAdminFlashMessagesTrait
     /**
      * Find error flash messages.
      *
-     * @param Crawler $crawler
-     *
-     * @return Crawler
+     * @return string[]
      */
-    private function findFlashErrorMessages(Crawler $crawler)
+    private function findFlashErrorMessages(Crawler $crawler): array
     {
         return $crawler
-            ->filter('div[class="alert alert-error fade in"]');
+            ->filter('div[class="alert alert-error fade in"]')
+            ->each(function (Crawler $element) {
+                return $element->evaluate('normalize-space(.)')[0];
+            });
     }
 
     /**
      * Find success flash messages.
      *
-     * @param Crawler $crawler
-     *
-     * @return Crawler
+     * @return string[]
      */
-    private function findFlashSuccessMessages(Crawler $crawler)
+    private function findFlashSuccessMessages(Crawler $crawler): array
     {
         return $crawler
-            ->filter('div[class="alert alert-success fade in"]');
+            ->filter('div[class="alert alert-success fade in"]')
+            ->each(function (Crawler $element) {
+                return $element->evaluate('normalize-space(.)')[0];
+            });
     }
 
     /**
      * Find info flash messages.
      *
-     * @param Crawler $crawler
-     *
-     * @return Crawler
+     * @return string[]
      */
-    private function findFlashInfoMessages(Crawler $crawler)
+    private function findFlashInfoMessages(Crawler $crawler): array
     {
         return $crawler
-            ->filter('div[class="alert alert-info fade in"]');
+            ->filter('div[class="alert alert-info fade in"]')
+            ->each(function (Crawler $element) {
+                return $element->evaluate('normalize-space(.)')[0];
+            });
     }
 
     /**
      * Find warning flash messages.
      *
-     * @param Crawler $crawler
-     *
-     * @return Crawler
+     * @return string[]
      */
-    private function findFlashWarningMessages(Crawler $crawler)
+    private function findFlashWarningMessages(Crawler $crawler): array
     {
         return $crawler
-            ->filter('div[class="alert alert-warning fade in"]');
+            ->filter('div[class="alert alert-warning fade in"]')
+            ->each(function (Crawler $element) {
+                return $element->evaluate('normalize-space(.)')[0];
+            });
     }
 }

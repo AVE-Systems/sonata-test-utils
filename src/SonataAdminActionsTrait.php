@@ -256,7 +256,7 @@ trait SonataAdminActionsTrait
         return $crawler
             ->filterXPath($xpath)
             ->each(function (Crawler $element) {
-                return $element->text();
+                return $element->evaluate('normalize-space(.)')[0];
             });
     }
 }
