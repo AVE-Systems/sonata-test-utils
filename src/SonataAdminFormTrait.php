@@ -529,46 +529,6 @@ trait SonataAdminFormTrait
     }
 
     /**
-     * Проверяет, что на странице создания/редактирования
-     * отсутствует кнопка, соответствующая переданному действию.
-     *
-     * @param string  $actionTitle
-     * @param Crawler $crawler
-     */
-    protected function assertFormActionButtonNotExists(
-        string $actionTitle,
-        Crawler $crawler
-    ): void {
-        $actionButtonXPath = $this->getFormActionButtonXPath($actionTitle);
-
-        $this->assertCount(
-            0,
-            $crawler->filterXPath($actionButtonXPath),
-            "На форме есть кнопка '$actionTitle'"
-        );
-    }
-
-    /**
-     * Проверяет, что на странице создания/редактирования
-     * присутствует кнопка, соответствующая переданному действию.
-     *
-     * @param string  $actionTitle
-     * @param Crawler $crawler
-     */
-    protected function assertFormActionButtonExists(
-        string $actionTitle,
-        Crawler $crawler
-    ): void {
-        $actionButtonXPath = $this->getFormActionButtonXPath($actionTitle);
-
-        $this->assertCount(
-            1,
-            $crawler->filterXPath($actionButtonXPath),
-            "На форме нет кнопки '$actionTitle'"
-        );
-    }
-
-    /**
      * Проверяет есть ли заданая ошибка для элемента формы с определенным лэйблом.
      *
      * @param string  $label   лэйбл для поиска элемента формы
@@ -729,22 +689,6 @@ trait SonataAdminFormTrait
     }
 
     /**
-     * Возвращает XPath-путь к кнопке действий над формой с заданным текстом.
-     *
-     * @param string $buttonText
-     *
-     * @return string
-     */
-    private function getFormActionButtonXPath(string $buttonText): string
-    {
-        $containerXPath = "div[contains(@class, 'sonata-ba-form-actions')]";
-        $buttonXpath = "button[@type='submit' and normalize-space()='$buttonText']";
-        $linkTypeButtonXpath = "a[normalize-space()='$buttonText']";
-
-        return "(//$containerXPath/$buttonXpath | //$containerXPath/$linkTypeButtonXpath)";
-    }
-
-    /**
      * Возвращает содержимое поля формы с заданными типом и заголовком без
      * начальных, конечных и повторяющихся пробелов.
      *
@@ -826,7 +770,7 @@ trait SonataAdminFormTrait
         $result = [];
 
         /**
-         * @var DOMElement
+         * @var DOMElement $selectedOption
          */
         foreach ($selectElement->children('option[selected]') as $selectedOption) {
             $result[] = trim($selectedOption->getAttribute('value'));
