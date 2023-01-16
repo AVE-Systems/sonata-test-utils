@@ -69,7 +69,7 @@ HTML;
     <ul class="nav nav-tabs">
         <li>
             <a href="#portfolio">
-                <i class="f$this->expectExceptionMessageMatches('.Вкладка с заголовком "Портфолио" найдена.');a fa-exclamation-circle"></i>
+                <i class="fa fa-exclamation-circle"></i>
                 Портфолио
             </a>
         </li>
@@ -209,5 +209,78 @@ HTML;
         $crawler->addHtmlContent($html);
 
         $this->assertTabNotExists('Портфолио', $crawler->filter('div.nav-tabs-custom'));
+    }
+
+    public function testAssertTabsEqual_ShouldNotThrowException()
+    {
+        $html = <<<'HTML'
+<div class="nav-tabs-custom">
+    <ul class="nav nav-tabs">
+        <li>
+            <a href="#portfolio">
+                <i class="fa fa-exclamation-circle"></i>
+                Портфолио
+            </a>
+        </li>
+        <li>
+            <a href="#tests" data-toggle="tab">
+                <i class="fa fa-exclamation-circle"></i>
+                Тесты
+            </a>
+        </li>
+    </ul>
+    <div class="tab-content">
+        <div class="tab-pane fade" id="portfolio">
+            Данные портфолио
+        </div>
+        <div class="tab-pane fade" id="tests">
+            Данные тестов
+        </div>
+    </div>
+</div>
+HTML;
+
+        $crawler = new Crawler();
+        $crawler->addHtmlContent($html);
+
+        $this->assertTabsEqual(['Портфолио', 'Тесты'], $crawler->filter('div.nav-tabs-custom'));
+    }
+
+    public function testAssertTabsEqual_ShouldThrowException()
+    {
+        $html = <<<'HTML'
+<div class="nav-tabs-custom">
+    <ul class="nav nav-tabs">
+        <li>
+            <a href="#portfolio">
+                <i class="fa fa-exclamation-circle"></i>
+                Портфолио
+            </a>
+        </li>
+        <li>
+            <a href="#tests" data-toggle="tab">
+                <i class="fa fa-exclamation-circle"></i>
+                Тесты
+            </a>
+        </li>
+    </ul>
+    <div class="tab-content">
+        <div class="tab-pane fade" id="portfolio">
+            Данные портфолио
+        </div>
+        <div class="tab-pane fade" id="tests">
+            Данные тестов
+        </div>
+    </div>
+</div>
+HTML;
+
+        $crawler = new Crawler();
+        $crawler->addHtmlContent($html);
+
+        $this->expectException(ExpectationFailedException::class);
+        $this->expectExceptionMessageMatches('.Набор вкладок не соответствует ожидаемому.');
+
+        $this->assertTabsEqual(['Тесты', 'Портфолио'], $crawler->filter('div.nav-tabs-custom'));
     }
 }

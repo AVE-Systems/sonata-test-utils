@@ -92,6 +92,65 @@ HTML;
         return [[$html]];
     }
 
+    public function dataProvider_TestAssertAction_WithTabMenu_WithFilterMenu_WithoutActions(): array
+    {
+        $html = <<<'HTML'
+<section class="content-header">
+    <div class="sticky-wrapper">
+        <nav class="navbar navbar-default" role="navigation">
+            <div class="container-fluid">
+                <div class="navbar-collapse">
+                    <div class="navbar-left">
+                        <ul class="nav navbar-nav">
+                            <li class="first last dropdown">
+                                <a href="#" class="dropdown-toggle" data-toggle="dropdown">
+                                    Отчеты
+                                    <b class="caret"></b>
+                                </a>
+                                <ul class="menu_level_1 dropdown-menu">
+                                    <li class="first last">
+                                        <a href="/app/organization-organization/list?report=orgs_not_have_directors">
+                                            Организации в которых нет контракта с директором
+                                        </a>
+                                    </li>
+                                </ul>
+                            </li>
+                        </ul>
+                    </div>
+                    <ul class="nav navbar-nav navbar-right">
+                        <li class="dropdown sonata-actions">
+                            <a href="#" class="dropdown-toggle sonata-ba-action" data-toggle="dropdown">
+                                <i class="fa fa-filter" aria-hidden="true"></i>
+                                Фильтры
+                                <span class="badge sonata-filter-count">2</span>
+                                <b class="caret"></b>
+                            </a>
+                            <ul class="dropdown-menu dropdown-menu-scrollable" role="menu">
+                                <li>
+                                    <a href="#" class="sonata-toggle-filter sonata-ba-action">
+                                        <i class="fa fa-check-square-o"></i>
+                                        Название
+                                    </a>
+                                </li>
+                                <li>
+                                    <a href="#" class="sonata-toggle-filter sonata-ba-action">
+                                        <i class="fa fa-check-square-o"></i>
+                                        Статус
+                                    </a>
+                                </li>
+                            </ul>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </nav>
+    </div>
+</section>
+HTML;
+
+        return [[$html]];
+    }
+
     public function dataProvider_TestAssertAction_WithoutTabMenu_WithoutFilterMenu_WithOnlyOneAction(): array
     {
         $html = <<<'HTML'
@@ -278,6 +337,7 @@ HTML;
 
     /**
      * @dataProvider dataProvider_TestAssertAction_WithTabMenu_WithFilterMenu_WithManyActions
+     * @dataProvider dataProvider_TestAssertAction_WithTabMenu_WithFilterMenu_WithoutActions
      *
      * @param string $html
      */
