@@ -102,6 +102,27 @@ trait SonataAdminTabTrait
     }
 
     /**
+     * Проверяет, что все вкладки в контейнере равны переданному значению.
+     *
+     * @param string[] $expectedTabs
+     * @param Crawler  $tabsContainer корневым узлом должен быть контейнер,
+     *                                содержащий контейнер с ярлыками
+     *                                вкладок (ul-список) и контейнер с панелями
+     *                                вкладок
+     */
+    protected function assertTabsEqual(array $expectedTabs, Crawler $tabsContainer)
+    {
+        $tabsXPath = "//{$this->tabLabelsContainerXPath()}/li//a";
+
+        $actualTabs = $tabsContainer->filterXPath($tabsXPath)
+            ->each(function (Crawler $t) {
+                return $t->evaluate('normalize-space(.)')[0];
+            });
+
+        $this->assertEquals($expectedTabs, $actualTabs, 'Набор вкладок не соответствует ожидаемому');
+    }
+
+    /**
      * Возвращает XPath-путь к контейнеру с ярлыками вкладок.
      *
      * @return string
