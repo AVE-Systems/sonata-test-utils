@@ -229,7 +229,7 @@ trait SonataAdminActionsTrait
 
     private function getHeaderFilterListXPath(): string
     {
-        return "{$this->getHeaderListsXPath()}[2]";
+        return "{$this->getHeaderListsXPath()}/li/a[contains(normalize-space(.),'Фильтры')]/parent::li/ul";
     }
 
     private function getListBatchAllActionButtonsXPath(): string
