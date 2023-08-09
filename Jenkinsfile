@@ -6,7 +6,7 @@ pipeline {
             steps {
                 sh '''
                     docker compose build php
-                    docker compose run --rm php composer install
+                    docker compose run --rm php php -d memory_limit=-1 composer install
                 '''
             }
         }
